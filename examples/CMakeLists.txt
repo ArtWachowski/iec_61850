@@ -1,6 +1,8 @@
 add_subdirectory(server_example_control)
 add_subdirectory(server_example_config_file)
 add_subdirectory(server_example_logging)
+add_subdirectory(server_example_write_handler)
+add_subdirectory(server_app)
 
 add_subdirectory(iec61850_client_example_control)
 add_subdirectory(iec61850_client_example_log)
