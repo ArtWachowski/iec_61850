@@ -46,7 +46,7 @@ option(CONFIG_IEC61850_SUPPORT_USER_READ_ACCESS_CONTROL "Allow user provided cal
 set(CONFIG_REPORTING_DEFAULT_REPORT_BUFFER_SIZE "65536" CACHE STRING "Default buffer size for buffered reports in byte" )
 
 # advanced options
-option(DEBUG "Enable debugging mode (include assertions)" OFF)
+option(DEBUG "Enable debugging mode (include assertions)" ON)
 option(DEBUG_SOCKET "Enable printf debugging for socket layer" ${DEBUG})
 option(DEBUG_COTP "Enable COTP printf debugging" ${DEBUG})
 option(DEBUG_ISO_SERVER "Enable ISO SERVER printf debugging" ${DEBUG})
