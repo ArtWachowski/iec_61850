@@ -1,5 +1,5 @@
 /*
- *  server_example_logging.c
+ *  server_app.c
  *
  *  - How to use a server with logging service
  *  - How to store arbitrary data in a log
@@ -58,9 +58,9 @@ controlHandlerForBinaryOutput(ControlAction action, void* parameter, MmsValue* v
         IedServer_updateAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1_stVal, value);
     }
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO2) {
-        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO2_t, timeStamp);
-        IedServer_updateAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO2_stVal, value);
+    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO5) {
+        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO5_t, timeStamp);
+        IedServer_updateAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO5_stVal, value);
     }
 
     if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO3) {
@@ -75,7 +75,6 @@ controlHandlerForBinaryOutput(ControlAction action, void* parameter, MmsValue* v
 
     return CONTROL_RESULT_OK;
 }
-
 
 static void
 connectionHandler (IedServer self, ClientConnection connection, bool connected, void* parameter)
@@ -118,6 +117,72 @@ entryDataCallback (void* parameter, const char* dataRef, const uint8_t* data, in
     return true;
 }
 
+/*
+*CONTROL STUFF
+*/
+
+static CheckHandlerResult
+checkHandler(ControlAction action, void* parameter, MmsValue* ctlVal, bool test, bool interlockCheck)
+{
+    ClientConnection clientCon = ControlAction_getClientConnection(action);
+
+    if (clientCon) {
+        printf("Control from client %s\n", ClientConnection_getPeerAddress(clientCon));
+    }
+    else {
+        printf("clientCon == NULL\n");
+    }
+
+    if (ControlAction_isSelect(action))
+        printf("check handler called by select command!\n");
+    else
+        printf("check handler called by operate command!\n");
+
+    if (interlockCheck)
+        printf("  with interlock check bit set!\n");
+
+    printf("  ctlNum: %i\n", ControlAction_getCtlNum(action));
+
+    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO6)
+        return CONTROL_ACCEPTED;
+
+    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO2)
+        return CONTROL_ACCEPTED;
+
+    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO7)
+        return CONTROL_ACCEPTED;
+
+    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO8)
+        return CONTROL_ACCEPTED;
+
+    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO9)
+        return CONTROL_ACCEPTED;
+
+    return CONTROL_OBJECT_UNDEFINED;
+}
+
+static MmsDataAccessError
+writeAccessHandler (DataAttribute* dataAttribute, MmsValue* value, ClientConnection connection, void* parameter)
+{
+    ControlModel ctlModelVal = (ControlModel) MmsValue_toInt32(value);
+
+    /* we only allow status-only and direct-operate */
+    if ((ctlModelVal == CONTROL_MODEL_STATUS_ONLY) || (ctlModelVal == CONTROL_MODEL_DIRECT_NORMAL))
+    {
+        IedServer_updateCtlModel(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO6, ctlModelVal);
+
+        printf("Changed GGIO1.SPCSI.ctlModel to %i\n", ctlModelVal);
+
+        return DATA_ACCESS_ERROR_SUCCESS;
+    }
+    else {
+        return DATA_ACCESS_ERROR_OBJECT_VALUE_INVALID;
+    }
+}
+/*
+*end CONTROL STUFF
+*/
+
 int
 main(int argc, char** argv)
 {
@@ -130,9 +195,9 @@ main(int argc, char** argv)
             (ControlHandler) controlHandlerForBinaryOutput,
             IEDMODEL_GenericIO_GGIO1_SPCSO1);
 
-    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO2,
+    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO5,
             (ControlHandler) controlHandlerForBinaryOutput,
-            IEDMODEL_GenericIO_GGIO1_SPCSO2);
+            IEDMODEL_GenericIO_GGIO1_SPCSO5);
 
     IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO3,
             (ControlHandler) controlHandlerForBinaryOutput,
@@ -142,11 +207,64 @@ main(int argc, char** argv)
             (ControlHandler) controlHandlerForBinaryOutput,
             IEDMODEL_GenericIO_GGIO1_SPCSO4);
 
+/*
+*CONTROL STUFF
+*/
+
+
+    /* Install handler for operate command */
+    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO6,
+            (ControlHandler) controlHandlerForBinaryOutput,
+            IEDMODEL_GenericIO_GGIO1_SPCSO6);
+
+    /*
+     * For SPCSO1 we want the user be able to change the control model by online service -
+     * so we install a write access handler to change the control model when the client
+     * writes to the "ctlModel" attribute.
+     */
+    IedServer_handleWriteAccess(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO6_ctlModel, writeAccessHandler, NULL);
+
+
+    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO2,
+            (ControlHandler) controlHandlerForBinaryOutput,
+            IEDMODEL_GenericIO_GGIO1_SPCSO2);
+
+    /* this is optional - performs operative checks */
+    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO2, checkHandler,
+            IEDMODEL_GenericIO_GGIO1_SPCSO2);
+
+
+    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO6,
+            (ControlHandler) controlHandlerForBinaryOutput,
+            IEDMODEL_GenericIO_GGIO1_SPCSO6);
+
+    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO7,
+            (ControlHandler) controlHandlerForBinaryOutput,
+            IEDMODEL_GenericIO_GGIO1_SPCSO7);
+ 
+    /* this is optional - performs operative checks */
+    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO8, checkHandler,
+            IEDMODEL_GenericIO_GGIO1_SPCSO8);
+
+
+    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO9,
+            (ControlHandler) controlHandlerForBinaryOutput,
+            IEDMODEL_GenericIO_GGIO1_SPCSO9);
+
+    /* this is optional - performs operative checks */
+    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO9, checkHandler,
+            IEDMODEL_GenericIO_GGIO1_SPCSO9);
+
+/*
+* FINISH CONTROL STUFF
+*/
+
+
     IedServer_setConnectionIndicationHandler(iedServer, (IedConnectionIndicationHandler) connectionHandler, NULL);
 
     LogStorage statusLog = SqliteLogStorage_createInstance("log_status.db");
 
-    LogStorage_setMaxLogEntries(statusLog, 10);
+    LogStorage_setMaxLogEntries(statusLog, 100);
 
     IedServer_setLogStorage(iedServer, "GenericIO/LLN0$EventLog", statusLog);
 

@@ -13,14 +13,14 @@
 #define DEBUG 0
 
 /* print debugging information with printf if set to 1 */
-#define DEBUG_SOCKET 0
+#define DEBUG_SOCKET 1
 #define DEBUG_COTP 0
 #define DEBUG_ISO_SERVER 0
 #define DEBUG_ISO_CLIENT 0
 #define DEBUG_IED_SERVER 0
 #define DEBUG_IED_CLIENT 0
 #define DEBUG_MMS_CLIENT 0
-#define DEBUG_MMS_SERVER 0
+#define DEBUG_MMS_SERVER 1
 #define DEBUG_GOOSE_SUBSCRIBER 0
 #define DEBUG_GOOSE_PUBLISHER 0
 #define DEBUG_SV_SUBSCRIBER 0
@@ -171,9 +171,9 @@
 #define CONFIG_IEC61850_FORCE_MEMORY_ALIGNMENT 1
 
 /* overwrite default results for MMS identify service */
-//#define CONFIG_DEFAULT_MMS_VENDOR_NAME "libiec61850.com"
-//#define CONFIG_DEFAULT_MMS_MODEL_NAME "LIBIEC61850"
-//#define CONFIG_DEFAULT_MMS_REVISION "1.0.0"
+#define CONFIG_DEFAULT_MMS_VENDOR_NAME "SIPROTEC"
+#define CONFIG_DEFAULT_MMS_MODEL_NAME "SIPROTEC 7KE85"
+#define CONFIG_DEFAULT_MMS_REVISION "1.4.1"
 
 /* MMS virtual file store base path - where MMS file services are looking for files */
 #define CONFIG_VIRTUAL_FILESTORE_BASEPATH "./vmd-filestore/"

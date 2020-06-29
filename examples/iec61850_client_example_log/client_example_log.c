@@ -66,6 +66,8 @@ int main(int argc, char** argv) {
 
     IedConnection_connect(con, &error, hostname, tcpPort);
 
+    printf("QueryLog failed (error code: %i)!\n", error);
+
     if (error == IED_ERROR_OK) {
 
         /* read list of logs in LN (optional - if you don't know the existing logs) */
@@ -97,9 +99,11 @@ int main(int argc, char** argv) {
         MmsValue* lcbValue = IedConnection_readObject(con, &error, "simpleIOGenericIO/LLN0.EventLog", IEC61850_FC_LG);
 
         if ((error == IED_ERROR_OK) && (MmsValue_getType(lcbValue) != MMS_DATA_ACCESS_ERROR)) {
+	    
+	    char printBuf[1024];
 
-            char printBuf[1024];
-
+            printf("LCB values: %s\n", printBuf);
+            
             MmsValue_printToBuffer(lcbValue, printBuf, 1024);
 
             printf("LCB values: %s\n", printBuf);

@@ -1,12 +1,12 @@
 LIBIEC_HOME=../..
 
-PROJECT_BINARY_NAME = server_app
-PROJECT_SOURCES = server_app.c
+PROJECT_BINARY_NAME = server_example_logging
+PROJECT_SOURCES = server_example_logging.c
 PROJECT_SOURCES += static_model.c
 PROJECT_SOURCES += $(LIBIEC_HOME)/src/logging/drivers/sqlite/log_storage_sqlite.c
 PROJECT_SOURCES += $(LIBIEC_HOME)/third_party/sqlite/sqlite3.c
 
-PROJECT_ICD_FILE = simpleIO_control_tests.icd
+PROJECT_ICD_FILE = simpleIO_direct_control.icd
 
 include $(LIBIEC_HOME)/make/target_system.mk
 include $(LIBIEC_HOME)/make/stack_includes.mk
@@ -30,3 +30,5 @@ $(PROJECT_BINARY_NAME):	$(PROJECT_SOURCES) $(LIB_NAME)
 
 clean:
 	rm -f $(PROJECT_BINARY_NAME)
+
+
