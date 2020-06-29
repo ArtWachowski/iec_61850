@@ -25,7 +25,7 @@
 #define DEBUG_GOOSE_PUBLISHER 0
 #define DEBUG_SV_SUBSCRIBER 0
 #define DEBUG_SV_PUBLISHER 0
-#define DEBUG_HAL_ETHERNET 0
+#define DEBUG_HAL_ETHERNET 1
 
 /* Maximum MMS PDU SIZE - default is 65000 */
 #define CONFIG_MMS_MAXIMUM_PDU_SIZE 65000
@@ -171,9 +171,9 @@
 #define CONFIG_IEC61850_FORCE_MEMORY_ALIGNMENT 1
 
 /* overwrite default results for MMS identify service */
-#define CONFIG_DEFAULT_MMS_VENDOR_NAME "SIPROTEC"
-#define CONFIG_DEFAULT_MMS_MODEL_NAME "SIPROTEC 7KE85"
-#define CONFIG_DEFAULT_MMS_REVISION "1.4.1"
+//#define CONFIG_DEFAULT_MMS_VENDOR_NAME "SIPROTEC"
+//#define CONFIG_DEFAULT_MMS_MODEL_NAME "SIPROTEC 7KE85"
+//#define CONFIG_DEFAULT_MMS_REVISION "1.4.1"
 
 /* MMS virtual file store base path - where MMS file services are looking for files */
 #define CONFIG_VIRTUAL_FILESTORE_BASEPATH "./vmd-filestore/"
