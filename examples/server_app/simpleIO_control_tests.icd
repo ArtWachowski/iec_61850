@@ -149,12 +149,12 @@
             </DOI>
             <DOI name="SPCSO3">
               <DAI name="ctlModel">
-                <Val>direct-with-enhanced-security</Val>
+                <Val>direct-with-normal-security</Val>
               </DAI>
             </DOI>
             <DOI name="SPCSO4">
               <DAI name="ctlModel">
-                <Val>sbo-with-enhanced-security</Val>
+                <Val>sbo-with-normal-security</Val>
               </DAI>
             </DOI>
             <DOI name="SPCSO5">
@@ -164,7 +164,7 @@
             </DOI>
             <DOI name="SPCSO6">
               <DAI name="ctlModel">
-                <Val>sbo-with-normal-security</Val>
+                <Val>direct-with-normal-security</Val>
               </DAI>
             </DOI>
             <DOI name="SPCSO7">
@@ -179,7 +179,7 @@
             </DOI>
             <DOI name="SPCSO9">
               <DAI name="ctlModel">
-                <Val>direct-with-enhanced-security</Val>
+                <Val>direct-with-normal-security</Val>
               </DAI>
             </DOI>
           </LN>
@@ -208,14 +208,14 @@
       <DO name="AnIn2" type="MV_1_AnIn1" />
       <DO name="AnIn3" type="MV_1_AnIn1" />
       <DO name="AnIn4" type="MV_1_AnIn1" />
-      <DO name="SPCSO1" type="SPC_1_SPCSO1" />
+      <DO name="SPCSO1" type="SPC_2_SPCSO1" />
       <DO name="SPCSO2" type="SPC_1_SPCSO2" />
-      <DO name="SPCSO3" type="SPC_1_SPCSO3" />
-      <DO name="SPCSO4" type="SPC_1_SPCSO4" />
-      <DO name="SPCSO5" type="SPC_1_SPCSO5" />
-      <DO name="SPCSO6" type="SPC_1_SPCSO6" />
-      <DO name="SPCSO7" type="SPC_1_SPCSO7" />
-      <DO name="SPCSO8" type="SPC_1_SPCSO8" />
+      <DO name="SPCSO3" type="SPC_1_SPCSO33" />
+      <DO name="SPCSO4" type="SPC_1_SPCSO11" />
+      <DO name="SPCSO5" type="SPC_1_SPCSO22" />
+      <DO name="SPCSO6" type="SPC_1_SPCSO1" />
+      <DO name="SPCSO7" type="SPC_1_SPCSO3" />
+      <DO name="SPCSO8" type="SPC_1_SPCSO4" />
       <DO name="SPCSO9" type="SPC_1_SPCSO3" />
       <DO name="Ind1" type="SPS_1_Proxy" />
       <DO name="Ind2" type="SPS_1_Proxy" />
@@ -309,6 +309,34 @@
       <DA name="vendor" bType="VisString255" fc="DC" />
       <DA name="swRev" bType="VisString255" fc="DC" />
       <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+    <DOType id="SPC_1_SPCSO22" cdc="SPC">
+      <DA name="stVal" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="Oper" type="SPCOperate_1" bType="Struct" fc="CO" />
+      <DA name="ctlModel" type="CtlModels" bType="Enum" fc="CF" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+    </DOType>
+    <DOType id="SPC_2_SPCSO1" cdc="SPC">
+      <DA name="stVal" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="Oper" type="SPCOperate_1" bType="Struct" fc="CO" />
+      <DA name="ctlModel" type="CtlModels" bType="Enum" fc="CF" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+    </DOType>
+    <DOType id="SPC_1_SPCSO33" cdc="SPC">
+      <DA name="stVal" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="Oper" type="SPCOperate_1" bType="Struct" fc="CO" />
+      <DA name="ctlModel" type="CtlModels" bType="Enum" fc="CF" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+    </DOType>
+    <DOType id="SPC_1_SPCSO11" cdc="SPC">
+      <DA name="stVal" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="Oper" type="SPCOperate_1" bType="Struct" fc="CO" />
+      <DA name="ctlModel" type="CtlModels" bType="Enum" fc="CF" />
+      <DA name="t" bType="Timestamp" fc="ST" />
     </DOType>
     <DOType id="SPC_1_SPCSO2" cdc="SPC">
       <DA name="SBO" bType="VisString64" fc="CO" />

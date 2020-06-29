@@ -143,10 +143,10 @@ checkHandler(ControlAction action, void* parameter, MmsValue* ctlVal, bool test,
 
     printf("  ctlNum: %i\n", ControlAction_getCtlNum(action));
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO6)
+    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO2)
         return CONTROL_ACCEPTED;
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO2)
+    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO6)
         return CONTROL_ACCEPTED;
 
     if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO7)
