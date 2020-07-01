@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-
+#include <syslog.h>
 #include "static_model.h"
 
 #include "logging_api.h"
@@ -36,17 +36,17 @@ static ControlHandlerResult
 controlHandlerForBinaryOutput(ControlAction action, void* parameter, MmsValue* value, bool test)
 {
     if (test) {
-        printf("Received test command\n");
+        syslog(LOG_ERR,"Received test command\n");
         return CONTROL_RESULT_FAILED;
     }
 
     if (MmsValue_getType(value) == MMS_BOOLEAN) {
-        printf("received binary control command: ");
+        syslog(LOG_ERR,"received binary control command: ");
 
         if (MmsValue_getBoolean(value))
-            printf("on\n");
+            syslog(LOG_ERR,"on\n");
         else
-            printf("off\n");
+            syslog(LOG_ERR,"off\n");
     }
     else
         return CONTROL_RESULT_FAILED;
@@ -80,9 +80,9 @@ static void
 connectionHandler (IedServer self, ClientConnection connection, bool connected, void* parameter)
 {
     if (connected)
-        printf("Connection opened\n");
+        syslog(LOG_ERR,"Connection opened\n");
     else
-        printf("Connection closed\n");
+        syslog(LOG_ERR,"Connection closed\n");
 }
 
 static bool
@@ -90,7 +90,7 @@ entryCallback(void* parameter, uint64_t timestamp, uint64_t entryID, bool moreFo
 {
 #if 0
     if (moreFollow)
-        printf("Found entry ID:%llu timestamp:%llu\n", entryID, timestamp);
+        syslog(LOG_ERR,"Found entry ID:%llu timestamp:%llu\n", entryID, timestamp);
 #endif
     return true;
 }
@@ -100,7 +100,7 @@ entryDataCallback (void* parameter, const char* dataRef, const uint8_t* data, in
 {
 #if 0
     if (moreFollow) {
-        printf("  EntryData: ref: %s\n", dataRef);
+        syslog(LOG_ERR,"  EntryData: ref: %s\n", dataRef);
 
         MmsValue* value = MmsValue_decodeMmsData(data, 0, dataSize);
 
@@ -108,7 +108,7 @@ entryDataCallback (void* parameter, const char* dataRef, const uint8_t* data, in
 
         MmsValue_printToBuffer(value, buffer, 256);
 
-        printf("  value: %s\n", buffer);
+        syslog(LOG_ERR,"  value: %s\n", buffer);
 
         MmsValue_delete(value);
     }
@@ -127,21 +127,21 @@ checkHandler(ControlAction action, void* parameter, MmsValue* ctlVal, bool test,
     ClientConnection clientCon = ControlAction_getClientConnection(action);
 
     if (clientCon) {
-        printf("Control from client %s\n", ClientConnection_getPeerAddress(clientCon));
+        syslog(LOG_ERR,"Control from client %s\n", ClientConnection_getPeerAddress(clientCon));
     }
     else {
-        printf("clientCon == NULL\n");
+        syslog(LOG_ERR,"clientCon == NULL\n");
     }
 
     if (ControlAction_isSelect(action))
-        printf("check handler called by select command!\n");
+        syslog(LOG_ERR,"check handler called by select command!\n");
     else
-        printf("check handler called by operate command!\n");
+        syslog(LOG_ERR,"check handler called by operate command!\n");
 
     if (interlockCheck)
-        printf("  with interlock check bit set!\n");
+        syslog(LOG_ERR,"  with interlock check bit set!\n");
 
-    printf("  ctlNum: %i\n", ControlAction_getCtlNum(action));
+    syslog(LOG_ERR,"  ctlNum: %i\n", ControlAction_getCtlNum(action));
 
     if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO2)
         return CONTROL_ACCEPTED;
@@ -171,7 +171,7 @@ writeAccessHandler (DataAttribute* dataAttribute, MmsValue* value, ClientConnect
     {
         IedServer_updateCtlModel(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO6, ctlModelVal);
 
-        printf("Changed GGIO1.SPCSI.ctlModel to %i\n", ctlModelVal);
+        syslog(LOG_ERR,"Changed GGIO1.SPCSI.ctlModel to %i\n", ctlModelVal);
 
         return DATA_ACCESS_ERROR_SUCCESS;
     }
@@ -186,7 +186,11 @@ writeAccessHandler (DataAttribute* dataAttribute, MmsValue* value, ClientConnect
 int
 main(int argc, char** argv)
 {
-    printf("Using libIEC61850 version %s\n", LibIEC61850_getVersionString());
+
+    openlog("IEC61850 APP", LOG_PID|LOG_CONS, LOG_USER);
+    syslog(LOG_ERR,"Started IEC61850 App %s\n", LibIEC61850_getVersionString());
+
+    syslog(LOG_ERR,"Using libIEC61850 version %s\n", LibIEC61850_getVersionString());
 
     iedServer = IedServer_create(&iedModel);
 
@@ -298,7 +302,7 @@ main(int argc, char** argv)
     IedServer_start(iedServer, 102);
 
     if (!IedServer_isRunning(iedServer)) {
-        printf("Starting server failed! Exit.\n");
+        syslog(LOG_ERR,"Starting server failed! Exit.\n");
         IedServer_destroy(iedServer);
         exit(-1);
     }
@@ -347,6 +351,9 @@ main(int argc, char** argv)
 
         Thread_sleep(100);
     }
+
+    syslog(LOG_ERR, "Stoped IEC61850 App");
+    closelog();
 
     /* stop MMS server - close TCP server socket and all client sockets */
     IedServer_stop(iedServer);
