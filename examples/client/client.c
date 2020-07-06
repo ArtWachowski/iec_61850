@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
     if (argc > 2)
         tcpPort = atoi(argv[2]);
 
-    char* logRef = "simpleIOGenericIO/LLN0$EventLog";
+    char* logRef = "simensSIMENS_RC7_A/LLN0$EventLog";
 
     IedClientError error;
 
@@ -87,12 +87,12 @@ int main(int argc, char** argv) {
     if (error == IED_ERROR_OK) {
 
         /* read list of logs in LN (optional - if you don't know the existing logs) */
-        LinkedList logs = IedConnection_getLogicalNodeDirectory(con, &error, "simpleIOGenericIO/LLN0", ACSI_CLASS_LOG);
+        LinkedList logs = IedConnection_getLogicalNodeDirectory(con, &error, "simensSIMENS_RC7_A/LLN0", ACSI_CLASS_LOG);
 
         if (error == IED_ERROR_OK) {
 
             if (LinkedList_size(logs) > 0) {
-                printf("Found logs in LN simpleIOGenericIO/LLN0:\n");
+                printf("Found logs in LN simensSIMENS_RC7_A/LLN0:\n");
 
                 LinkedList log = LinkedList_getNext(logs);
 
@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
         }
 
         /* read log control block (using the generic read function) */
-        MmsValue* lcbValue = IedConnection_readObject(con, &error, "simpleIOGenericIO/LLN0.EventLog", IEC61850_FC_LG);
+        MmsValue* lcbValue = IedConnection_readObject(con, &error, "simensSIMENS_RC7_A/LLN0.EventLog", IEC61850_FC_LG);
 
         if ((error == IED_ERROR_OK) && (MmsValue_getType(lcbValue) != MMS_DATA_ACCESS_ERROR)) {
 	    
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
              * read the log contents. Be aware that the logRef uses the '$' sign as separator between the LN and
              * the log name! This is in contrast to the LCB object reference above.
              */
-            LinkedList logEntries = IedConnection_queryLogAfter(con, &error, "simpleIOGenericIO/LLN0$EventLog", oldEntry, timestamp, &moreFollows);
+            LinkedList logEntries = IedConnection_queryLogAfter(con, &error, "simensSIMENS_RC7_A/LLN0$EventLog", oldEntry, timestamp, &moreFollows);
 
             if (error == IED_ERROR_OK) {
                 printJournalEntries(logEntries);
@@ -161,17 +161,17 @@ int main(int argc, char** argv) {
          ***********************/
         
         ControlObjectClient control
-            = ControlObjectClient_create("simpleIOGenericIO/GGIO1.SPCSO6", con);
+            = ControlObjectClient_create("simensSIMENS_RC7_A/GGIO1.SPCSO6", con);
 
         MmsValue* ctlVal = MmsValue_newBoolean(true);
 
         ControlObjectClient_setOrigin(control, NULL, 3);
 
         if (ControlObjectClient_operate(control, ctlVal, 1 /* operate now */)) {
-            printf("simpleIOGenericIO/GGIO1.SPCSO6 operated successfully\n");
+            printf("simensSIMENS_RC7_A/GGIO1.SPCSO6 operated successfully\n");
         }
         else {
-            printf("failed to operate simpleIOGenericIO/GGIO1.SPCSO6\n");
+            printf("failed to operate simensSIMENS_RC7_A/GGIO1.SPCSO6\n");
         }
 
         MmsValue_delete(ctlVal);
@@ -180,16 +180,16 @@ int main(int argc, char** argv) {
 
         /* Check if status value has changed */
 
-        MmsValue* stVal = IedConnection_readObject(con, &error, "simpleIOGenericIO/GGIO1.SPCSO6.stVal", IEC61850_FC_ST);
+        MmsValue* stVal = IedConnection_readObject(con, &error, "simensSIMENS_RC7_A/GGIO1.SPCSO6.stVal", IEC61850_FC_ST);
 
         if (error == IED_ERROR_OK) {
             bool state = MmsValue_getBoolean(stVal);
             MmsValue_delete(stVal);
 
-            printf("New status of simpleIOGenericIO/GGIO1.SPCSO6.stVal: %i\n", state);
+            printf("New status of simensSIMENS_RC7_A/GGIO1.SPCSO6.stVal: %i\n", state);
         }
         else {
-            printf("Reading status for simpleIOGenericIO/GGIO1.SPCSO6 failed!\n");
+            printf("Reading status for simensSIMENS_RC7_A/GGIO1.SPCSO6 failed!\n");
         }
 
 
@@ -197,23 +197,23 @@ int main(int argc, char** argv) {
          * Select before operate
          ***********************/
 
-        control = ControlObjectClient_create("simpleIOGenericIO/GGIO1.SPCSO2", con);
+        control = ControlObjectClient_create("simensSIMENS_RC7_A/GGIO1.SPCSO2", con);
 
         if (ControlObjectClient_select(control)) {
 
             ctlVal = MmsValue_newBoolean(true);
 
             if (ControlObjectClient_operate(control, ctlVal, 0 /* operate now */)) {
-                printf("simpleIOGenericIO/GGIO1.SPCSO2 operated successfully\n");
+                printf("simensSIMENS_RC7_A/GGIO1.SPCSO2 operated successfully\n");
             }
             else {
-                printf("failed to operate simpleIOGenericIO/GGIO1.SPCSO2!\n");
+                printf("failed to operate simensSIMENS_RC7_A/GGIO1.SPCSO2!\n");
             }
 
             MmsValue_delete(ctlVal);
         }
         else {
-            printf("failed to select simpleIOGenericIO/GGIO1.SPCSO2!\n");
+            printf("failed to select simensSIMENS_RC7_A/GGIO1.SPCSO2!\n");
         }
 
         ControlObjectClient_destroy(control);
@@ -223,17 +223,17 @@ int main(int argc, char** argv) {
          * Direct control with enhanced security
          ****************************************/
 
-        control = ControlObjectClient_create("simpleIOGenericIO/GGIO1.SPCSO7", con);
+        control = ControlObjectClient_create("simensSIMENS_RC7_A/GGIO1.SPCSO7", con);
 
         ControlObjectClient_setCommandTerminationHandler(control, commandTerminationHandler, NULL);
 
         ctlVal = MmsValue_newBoolean(true);
 
         if (ControlObjectClient_operate(control, ctlVal, 0 /* operate now */)) {
-            printf("simpleIOGenericIO/GGIO1.SPCSO7 operated successfully\n");
+            printf("simensSIMENS_RC7_A/GGIO1.SPCSO7 operated successfully\n");
         }
         else {
-            printf("failed to operate simpleIOGenericIO/GGIO1.SPCSO7\n");
+            printf("failed to operate simensSIMENS_RC7_A/GGIO1.SPCSO7\n");
         }
 
         MmsValue_delete(ctlVal);
@@ -245,24 +245,24 @@ int main(int argc, char** argv) {
 
         /* Check if status value has changed */
 
-       stVal = IedConnection_readObject(con, &error, "simpleIOGenericIO/GGIO1.SPCSO7.stVal", IEC61850_FC_ST);
+       stVal = IedConnection_readObject(con, &error, "simensSIMENS_RC7_A/GGIO1.SPCSO7.stVal", IEC61850_FC_ST);
 
         if (error == IED_ERROR_OK) {
             bool state = MmsValue_getBoolean(stVal);
 
-            printf("New status of simpleIOGenericIO/GGIO1.SPCSO7.stVal: %i\n", state);
+            printf("New status of simensSIMENS_RC7_A/GGIO1.SPCSO7.stVal: %i\n", state);
 
             MmsValue_delete(stVal);
         }
         else {
-            printf("Reading status for simpleIOGenericIO/GGIO1.SPCSO7 failed!\n");
+            printf("Reading status for simensSIMENS_RC7_A/GGIO1.SPCSO7 failed!\n");
         }
 
         /***********************************************
          * Select before operate with enhanced security
          ***********************************************/
 
-        control = ControlObjectClient_create("simpleIOGenericIO/GGIO1.SPCSO8", con);
+        control = ControlObjectClient_create("simensSIMENS_RC7_A/GGIO1.SPCSO8", con);
 
         ControlObjectClient_setCommandTerminationHandler(control, commandTerminationHandler, NULL);
 
@@ -271,15 +271,15 @@ int main(int argc, char** argv) {
         if (ControlObjectClient_selectWithValue(control, ctlVal)) {
 
             if (ControlObjectClient_operate(control, ctlVal, 0 /* operate now */)) {
-                printf("simpleIOGenericIO/GGIO1.SPCSO8 operated successfully\n");
+                printf("simensSIMENS_RC7_A/GGIO1.SPCSO8 operated successfully\n");
             }
             else {
-                printf("failed to operate simpleIOGenericIO/GGIO1.SPCSO8!\n");
+                printf("failed to operate simensSIMENS_RC7_A/GGIO1.SPCSO8!\n");
             }
 
         }
         else {
-            printf("failed to select simpleIOGenericIO/GGIO1.SPCSO8!\n");
+            printf("failed to select simensSIMENS_RC7_A/GGIO1.SPCSO8!\n");
         }
 
         MmsValue_delete(ctlVal);
@@ -294,17 +294,17 @@ int main(int argc, char** argv) {
          * Direct control with enhanced security (expect CommandTermination-)
          *********************************************************************/
 
-        control = ControlObjectClient_create("simpleIOGenericIO/GGIO1.SPCSO9", con);
+        control = ControlObjectClient_create("simensSIMENS_RC7_A/GGIO1.SPCSO9", con);
 
         ControlObjectClient_setCommandTerminationHandler(control, commandTerminationHandler, NULL);
 
         ctlVal = MmsValue_newBoolean(true);
 
         if (ControlObjectClient_operate(control, ctlVal, 0 /* operate now */)) {
-            printf("simpleIOGenericIO/GGIO1.SPCSO9 operated successfully\n");
+            printf("simensSIMENS_RC7_A/GGIO1.SPCSO9 operated successfully\n");
         }
         else {
-            printf("failed to operate simpleIOGenericIO/GGIO1.SPCSO9\n");
+            printf("failed to operate simensSIMENS_RC7_A/GGIO1.SPCSO9\n");
         }
 
         MmsValue_delete(ctlVal);

@@ -1,9 +1,5 @@
 /*
  *  server_app.c
- *
- *  - How to use a server with logging service
- *  - How to store arbitrary data in a log
- *
  */
 
 #include "iec61850_server.h"
@@ -14,7 +10,6 @@
 #include <math.h>
 #include <syslog.h>
 #include "static_model.h"
-
 #include "logging_api.h"
 
 LogStorage
@@ -35,42 +30,47 @@ sigint_handler(int signalId)
 static ControlHandlerResult
 controlHandlerForBinaryOutput(ControlAction action, void* parameter, MmsValue* value, bool test)
 {
+    ClientConnection clientCon = ControlAction_getClientConnection(action);
+
     if (test) {
-        syslog(LOG_ERR,"Received test command\n");
+        syslog(LOG_ERR,"Received test command from client %s\n - CONTROL_RESULT_FAILED \n", ClientConnection_getPeerAddress(clientCon));
         return CONTROL_RESULT_FAILED;
     }
 
     if (MmsValue_getType(value) == MMS_BOOLEAN) {
-        syslog(LOG_ERR,"received binary control command: ");
-
+        
         if (MmsValue_getBoolean(value))
-            syslog(LOG_ERR,"on\n");
+            syslog(LOG_ERR,"Received binary control command: ON from client %s\n", ClientConnection_getPeerAddress(clientCon));
         else
-            syslog(LOG_ERR,"off\n");
+            syslog(LOG_ERR,"Received binary control command: OFF from client %s\n", ClientConnection_getPeerAddress(clientCon));
     }
     else
         return CONTROL_RESULT_FAILED;
 
     uint64_t timeStamp = Hal_getTimeInMs();
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO1) {
-        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1_t, timeStamp);
-        IedServer_updateAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1_stVal, value);
+    if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO1) {
+        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO1_t, timeStamp);
+        IedServer_updateAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO1_stVal, value);
+        syslog(LOG_ERR,"Client %s updated parameter IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO1 \n", ClientConnection_getPeerAddress(clientCon));
     }
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO5) {
-        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO5_t, timeStamp);
-        IedServer_updateAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO5_stVal, value);
+    if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO5) {
+        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO5_t, timeStamp);
+        IedServer_updateAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO5_stVal, value);
+        syslog(LOG_ERR,"Client %s updated parameter IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO5 \n", ClientConnection_getPeerAddress(clientCon));
     }
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO3) {
-        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO3_t, timeStamp);
-        IedServer_updateAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO3_stVal, value);
+    if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO3) {
+        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO3_t, timeStamp);
+        IedServer_updateAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO3_stVal, value);
+        syslog(LOG_ERR,"Client %s updated parameter IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO3 \n", ClientConnection_getPeerAddress(clientCon));
     }
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO4) {
-        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO4_t, timeStamp);
-        IedServer_updateAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO4_stVal, value);
+    if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO4) {
+        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO4_t, timeStamp);
+        IedServer_updateAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO4_stVal, value);
+        syslog(LOG_ERR,"Client %s updated parameter IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO4 \n", ClientConnection_getPeerAddress(clientCon));
     }
 
     return CONTROL_RESULT_OK;
@@ -79,10 +79,12 @@ controlHandlerForBinaryOutput(ControlAction action, void* parameter, MmsValue* v
 static void
 connectionHandler (IedServer self, ClientConnection connection, bool connected, void* parameter)
 {
+    ClientConnection conn = connection;
+
     if (connected)
-        syslog(LOG_ERR,"Connection opened\n");
+        syslog(LOG_ERR,"Connection from client %s opened\n", ClientConnection_getPeerAddress(conn));
     else
-        syslog(LOG_ERR,"Connection closed\n");
+        syslog(LOG_ERR,"Connection from client %s closed\n", ClientConnection_getPeerAddress(conn));
 }
 
 static bool
@@ -100,15 +102,14 @@ entryDataCallback (void* parameter, const char* dataRef, const uint8_t* data, in
 {
 #if 0
     if (moreFollow) {
-        syslog(LOG_ERR,"  EntryData: ref: %s\n", dataRef);
-
+        
         MmsValue* value = MmsValue_decodeMmsData(data, 0, dataSize);
 
         char buffer[256];
 
         MmsValue_printToBuffer(value, buffer, 256);
 
-        syslog(LOG_ERR,"  value: %s\n", buffer);
+        syslog(LOG_ERR,"EntryData: ref: %s\n - Value: %s\n",dataRef, buffer);
 
         MmsValue_delete(value);
     }
@@ -117,46 +118,53 @@ entryDataCallback (void* parameter, const char* dataRef, const uint8_t* data, in
     return true;
 }
 
-/*
-*CONTROL STUFF
-*/
-
 static CheckHandlerResult
 checkHandler(ControlAction action, void* parameter, MmsValue* ctlVal, bool test, bool interlockCheck)
 {
     ClientConnection clientCon = ControlAction_getClientConnection(action);
 
     if (clientCon) {
-        syslog(LOG_ERR,"Control from client %s\n", ClientConnection_getPeerAddress(clientCon));
+        syslog(LOG_ERR,"Connection from client %s\n", ClientConnection_getPeerAddress(clientCon));
     }
     else {
-        syslog(LOG_ERR,"clientCon == NULL\n");
+        syslog(LOG_ERR,"ClientCon == NULL\n");
     }
 
     if (ControlAction_isSelect(action))
-        syslog(LOG_ERR,"check handler called by select command!\n");
+        syslog(LOG_ERR,"Control check handler called by select command\n");
     else
-        syslog(LOG_ERR,"check handler called by operate command!\n");
+        syslog(LOG_ERR,"Control check handler called by operate command\n");
 
     if (interlockCheck)
-        syslog(LOG_ERR,"  with interlock check bit set!\n");
+        syslog(LOG_ERR,"Control command with interlock check bit set!\n");
 
-    syslog(LOG_ERR,"  ctlNum: %i\n", ControlAction_getCtlNum(action));
+    syslog(LOG_ERR,"Control command action with ctlNum: %i\n", ControlAction_getCtlNum(action));
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO2)
+    if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO2){
         return CONTROL_ACCEPTED;
+	syslog(LOG_ERR," Control command GGIO1_SPCSO2 ACCEPTED");
+    }	
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO6)
+    if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6){
         return CONTROL_ACCEPTED;
+	syslog(LOG_ERR," Control command GGIO1_SPCSO6 ACCEPTED");
+    }	
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO7)
+    if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO7){
         return CONTROL_ACCEPTED;
+	syslog(LOG_ERR," Control command GGIO1_SPCSO7 ACCEPTED");
+    }	
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO8)
-        return CONTROL_ACCEPTED;
+    if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO8){
+        return CONTROL_ACCEPTED;	
+        syslog(LOG_ERR," Control command GGIO1_SPCSO8 ACCEPTED");
+    }	
 
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO9)
+    if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO9){
         return CONTROL_ACCEPTED;
+	syslog(LOG_ERR," Control command GGIO1_SPCSO9 ACCEPTED");
+    }	
+
 
     return CONTROL_OBJECT_UNDEFINED;
 }
@@ -169,7 +177,7 @@ writeAccessHandler (DataAttribute* dataAttribute, MmsValue* value, ClientConnect
     /* we only allow status-only and direct-operate */
     if ((ctlModelVal == CONTROL_MODEL_STATUS_ONLY) || (ctlModelVal == CONTROL_MODEL_DIRECT_NORMAL))
     {
-        IedServer_updateCtlModel(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO6, ctlModelVal);
+        IedServer_updateCtlModel(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6, ctlModelVal);
 
         syslog(LOG_ERR,"Changed GGIO1.SPCSI.ctlModel to %i\n", ctlModelVal);
 
@@ -177,11 +185,9 @@ writeAccessHandler (DataAttribute* dataAttribute, MmsValue* value, ClientConnect
     }
     else {
         return DATA_ACCESS_ERROR_OBJECT_VALUE_INVALID;
+        syslog(LOG_ERR,"DATA_ACCESS_ERROR_OBJECT_VALUE_INVALID");
     }
 }
-/*
-*end CONTROL STUFF
-*/
 
 int
 main(int argc, char** argv)
@@ -190,26 +196,24 @@ main(int argc, char** argv)
     openlog("IEC61850 APP", LOG_PID|LOG_CONS, LOG_USER);
     syslog(LOG_ERR,"Started IEC61850 App %s\n", LibIEC61850_getVersionString());
 
-    syslog(LOG_ERR,"Using libIEC61850 version %s\n", LibIEC61850_getVersionString());
-
     iedServer = IedServer_create(&iedModel);
 
     /* Install handler for operate command */
-    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1,
+    IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO1,
             (ControlHandler) controlHandlerForBinaryOutput,
-            IEDMODEL_GenericIO_GGIO1_SPCSO1);
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO1);
 
-    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO5,
+    IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO5,
             (ControlHandler) controlHandlerForBinaryOutput,
-            IEDMODEL_GenericIO_GGIO1_SPCSO5);
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO5);
 
-    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO3,
+    IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO3,
             (ControlHandler) controlHandlerForBinaryOutput,
-            IEDMODEL_GenericIO_GGIO1_SPCSO3);
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO3);
 
-    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO4,
+    IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO4,
             (ControlHandler) controlHandlerForBinaryOutput,
-            IEDMODEL_GenericIO_GGIO1_SPCSO4);
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO4);
 
 /*
 *CONTROL STUFF
@@ -217,83 +221,66 @@ main(int argc, char** argv)
 
 
     /* Install handler for operate command */
-    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO6,
+    IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6,
             (ControlHandler) controlHandlerForBinaryOutput,
-            IEDMODEL_GenericIO_GGIO1_SPCSO6);
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6);
 
     /*
      * For SPCSO1 we want the user be able to change the control model by online service -
      * so we install a write access handler to change the control model when the client
      * writes to the "ctlModel" attribute.
      */
-    IedServer_handleWriteAccess(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO6_ctlModel, writeAccessHandler, NULL);
+    IedServer_handleWriteAccess(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6_ctlModel, writeAccessHandler, NULL);
 
 
-    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO2,
+    IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO2,
             (ControlHandler) controlHandlerForBinaryOutput,
-            IEDMODEL_GenericIO_GGIO1_SPCSO2);
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO2);
 
     /* this is optional - performs operative checks */
-    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO2, checkHandler,
-            IEDMODEL_GenericIO_GGIO1_SPCSO2);
+    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO2, checkHandler,
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO2);
 
 
-    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO6,
+    IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6,
             (ControlHandler) controlHandlerForBinaryOutput,
-            IEDMODEL_GenericIO_GGIO1_SPCSO6);
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6);
 
-    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO7,
+    IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO7,
             (ControlHandler) controlHandlerForBinaryOutput,
-            IEDMODEL_GenericIO_GGIO1_SPCSO7);
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO7);
  
     /* this is optional - performs operative checks */
-    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO8, checkHandler,
-            IEDMODEL_GenericIO_GGIO1_SPCSO8);
+    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO8, checkHandler,
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO8);
 
 
-    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO9,
+    IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO9,
             (ControlHandler) controlHandlerForBinaryOutput,
-            IEDMODEL_GenericIO_GGIO1_SPCSO9);
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO9);
 
     /* this is optional - performs operative checks */
-    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO9, checkHandler,
-            IEDMODEL_GenericIO_GGIO1_SPCSO9);
-
-/*
-* FINISH CONTROL STUFF
-*/
+    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO9, checkHandler,
+            IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO9);
 
 
     IedServer_setConnectionIndicationHandler(iedServer, (IedConnectionIndicationHandler) connectionHandler, NULL);
-
     LogStorage statusLog = SqliteLogStorage_createInstance("log_status.db");
-
     LogStorage_setMaxLogEntries(statusLog, 100);
-
-    IedServer_setLogStorage(iedServer, "GenericIO/LLN0$EventLog", statusLog);
+    IedServer_setLogStorage(iedServer, "SIMENS_RC7_A/LLN0$EventLog", statusLog);
 
 #if 1
     uint64_t entryID = LogStorage_addEntry(statusLog, Hal_getTimeInMs());
-
     MmsValue* value = MmsValue_newIntegerFromInt32(123);
-
     uint8_t blob[256];
-
     int blobSize = MmsValue_encodeMmsData(value, blob, 0, true);
 
-
     LogStorage_addEntryData(statusLog, entryID, "simpleIOGenerioIO/GPIO1$ST$SPCSO1$stVal", blob, blobSize, 0);
-
     MmsValue_delete(value);
-
     value = MmsValue_newUtcTimeByMsTime(Hal_getTimeInMs());
-
     blobSize = MmsValue_encodeMmsData(value, blob, 0, true);
-
     MmsValue_delete(value);
-
     LogStorage_addEntryData(statusLog, entryID, "simpleIOGenerioIO/GPIO1$ST$SPCSO1$t", blob, blobSize, 0);
-
     LogStorage_getEntries(statusLog, 0, Hal_getTimeInMs(), entryCallback, (LogEntryDataCallback) entryDataCallback, NULL);
 #endif
 
@@ -335,17 +322,17 @@ main(int argc, char** argv)
         if (((int) t % 2) == 0)
             Timestamp_setClockNotSynchronized(&iecTimestamp, true);
 
-        IedServer_updateTimestampAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn1_t, &iecTimestamp);
-        IedServer_updateFloatAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn1_mag_f, an1);
+        IedServer_updateTimestampAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_AnIn1_t, &iecTimestamp);
+        IedServer_updateFloatAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_AnIn1_mag_f, an1);
 
-        IedServer_updateTimestampAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn2_t, &iecTimestamp);
-        IedServer_updateFloatAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn2_mag_f, an2);
+        IedServer_updateTimestampAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_AnIn2_t, &iecTimestamp);
+        IedServer_updateFloatAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_AnIn2_mag_f, an2);
 
-        IedServer_updateTimestampAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn3_t, &iecTimestamp);
-        IedServer_updateFloatAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn3_mag_f, an3);
+        IedServer_updateTimestampAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_AnIn3_t, &iecTimestamp);
+        IedServer_updateFloatAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_AnIn3_mag_f, an3);
 
-        IedServer_updateTimestampAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn4_t, &iecTimestamp);
-        IedServer_updateFloatAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn4_mag_f, an4);
+        IedServer_updateTimestampAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_AnIn4_t, &iecTimestamp);
+        IedServer_updateFloatAttributeValue(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_AnIn4_mag_f, an4);
 
         IedServer_unlockDataModel(iedServer);
 

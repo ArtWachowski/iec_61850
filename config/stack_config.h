@@ -13,19 +13,19 @@
 #define DEBUG 0
 
 /* print debugging information with printf if set to 1 */
-#define DEBUG_SOCKET 1
+#define DEBUG_SOCKET 0
 #define DEBUG_COTP 0
 #define DEBUG_ISO_SERVER 0
 #define DEBUG_ISO_CLIENT 0
 #define DEBUG_IED_SERVER 0
 #define DEBUG_IED_CLIENT 0
 #define DEBUG_MMS_CLIENT 0
-#define DEBUG_MMS_SERVER 1
+#define DEBUG_MMS_SERVER 0
 #define DEBUG_GOOSE_SUBSCRIBER 0
 #define DEBUG_GOOSE_PUBLISHER 0
 #define DEBUG_SV_SUBSCRIBER 0
 #define DEBUG_SV_PUBLISHER 0
-#define DEBUG_HAL_ETHERNET 1
+#define DEBUG_HAL_ETHERNET 0
 
 /* Maximum MMS PDU SIZE - default is 65000 */
 #define CONFIG_MMS_MAXIMUM_PDU_SIZE 65000

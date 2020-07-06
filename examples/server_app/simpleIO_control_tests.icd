@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SCL xmlns="http://www.iec.ch/61850/2003/SCL">
-  <Header id="" version="1.0.0" revision="" toolID="" nameStructure="IEDName">
+  <Header id="Substation X567-A1" version="1.0.0" revision="M.k" toolID="456" nameStructure="IEDName">
   </Header>
   <Communication>
     <SubNetwork name="subnetwork1" type="8-MMS">
-      <ConnectedAP iedName="simpleIO" apName="accessPoint1">
+      <ConnectedAP iedName="simens" apName="accessPoint1">
         <Address>
           <P type="IP">0.0.0.0</P>
           <P type="IP-SUBNET">255.255.255.0</P>
-          <P type="IP-GATEWAY">10.0.0.1</P>
+          <P type="IP-GATEWAY">10.64.64.64</P>
           <P type="OSI-TSEL">0001</P>
           <P type="OSI-PSEL">00000001</P>
           <P type="OSI-SSEL">0001</P>
@@ -16,7 +16,7 @@
       </ConnectedAP>
     </SubNetwork>
   </Communication>
-  <IED name="simpleIO">
+  <IED name="simens">
     <Services>
       <DynAssociation />
       <GetDirectory />
@@ -32,47 +32,47 @@
     <AccessPoint name="accessPoint1">
       <Server>
         <Authentication />
-        <LDevice inst="GenericIO">
+        <LDevice inst="SIMENS_RC7_A">
           <LN0 lnClass="LLN0" lnType="LLN01" inst="">
 	    <DataSet name="Events" desc="Events">
-              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO1" daName="stVal" />
+              <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO1" daName="stVal" />
 
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO5" daName="stVal" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO5" daName="stVal" />
 
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO3" daName="stVal" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO3" daName="stVal" />
 
-              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO4" daName="stVal" />
+              <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO4" daName="stVal" />
 	    </DataSet>
 
             <DataSet name="Events2" desc="Events2">
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO1" />
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO5" />
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO3" />
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO4" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO1" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO5" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO3" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO4" />
 	    </DataSet>
 
 	    <DataSet name="Measurements" desc="Measurements">
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn1" daName="mag.f" />
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn1" daName="q" />
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn2" daName="mag.f" />
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn2" daName="q" />
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn3" daName="mag.f" />
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn3" daName="q" />
-	      <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn4" daName="mag.f" />
-              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn4" daName="q" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn1" daName="mag.f" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn1" daName="q" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn2" daName="mag.f" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn2" daName="q" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn3" daName="mag.f" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn3" daName="q" />
+	      <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn4" daName="mag.f" />
+              <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn4" daName="q" />
             </DataSet>
 
           
             <DataSet name="ControlEvents" desc="control related events">
-              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO2" daName="stVal" />
+              <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO2" daName="stVal" />
 
-              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO6" daName="stVal" />
-              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO7" daName="stVal" />
-              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO8" daName="stVal" />
-              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO9" daName="stVal" />
-              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO2" daName="stSeld" />
-              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="OR" lnInst="1" doName="SPCSO2" daName="opRcvd" />
-              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="OR" lnInst="1" doName="SPCSO2" daName="opOk" />
+              <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO6" daName="stVal" />
+              <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO7" daName="stVal" />
+              <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO8" daName="stVal" />
+              <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO9" daName="stVal" />
+              <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO2" daName="stSeld" />
+              <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="OR" lnInst="1" doName="SPCSO2" daName="opRcvd" />
+              <FCDA ldInst="SIMENS_RC7_A" lnClass="GGIO" fc="OR" lnInst="1" doName="SPCSO2" daName="opOk" />
             </DataSet>
             
             <ReportControl name="ControlEventsRCB" confRev="1" datSet="ControlEvents" rptID="ControlEvents" buffered="false" intgPd="1000" bufTime="0" indexed="true">
