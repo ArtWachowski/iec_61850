@@ -38,7 +38,7 @@ controlHandlerForBinaryOutput(ControlAction action, void* parameter, MmsValue* v
     }
 
     if (MmsValue_getType(value) == MMS_BOOLEAN) {
-        
+
         if (MmsValue_getBoolean(value))
             syslog(LOG_ERR,"Received binary control command: ON from client %s\n", ClientConnection_getPeerAddress(clientCon));
         else
@@ -102,7 +102,7 @@ entryDataCallback (void* parameter, const char* dataRef, const uint8_t* data, in
 {
 #if 0
     if (moreFollow) {
-        
+
         MmsValue* value = MmsValue_decodeMmsData(data, 0, dataSize);
 
         char buffer[256];
@@ -142,28 +142,28 @@ checkHandler(ControlAction action, void* parameter, MmsValue* ctlVal, bool test,
 
     if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO2){
         return CONTROL_ACCEPTED;
-	syslog(LOG_ERR," Control command GGIO1_SPCSO2 ACCEPTED");
-    }	
+        syslog(LOG_ERR," Control command GGIO1_SPCSO2 ACCEPTED");
+    }
 
     if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6){
         return CONTROL_ACCEPTED;
-	syslog(LOG_ERR," Control command GGIO1_SPCSO6 ACCEPTED");
-    }	
+        syslog(LOG_ERR," Control command GGIO1_SPCSO6 ACCEPTED");
+    }
 
     if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO7){
         return CONTROL_ACCEPTED;
-	syslog(LOG_ERR," Control command GGIO1_SPCSO7 ACCEPTED");
-    }	
+        syslog(LOG_ERR," Control command GGIO1_SPCSO7 ACCEPTED");
+    }
 
     if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO8){
-        return CONTROL_ACCEPTED;	
+        return CONTROL_ACCEPTED;
         syslog(LOG_ERR," Control command GGIO1_SPCSO8 ACCEPTED");
-    }	
+    }
 
     if (parameter == IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO9){
         return CONTROL_ACCEPTED;
-	syslog(LOG_ERR," Control command GGIO1_SPCSO9 ACCEPTED");
-    }	
+        syslog(LOG_ERR," Control command GGIO1_SPCSO9 ACCEPTED");
+    }
 
 
     return CONTROL_OBJECT_UNDEFINED;
@@ -193,7 +193,7 @@ int
 main(int argc, char** argv)
 {
 
-    openlog("IEC61850_APP", LOG_PID|LOG_CONS, LOG_USER);
+    openlog(" SERVER_APP: ", LOG_PID, LOG_SYSLOG);
     syslog(LOG_ERR,"Started IEC61850 App %s \n", LibIEC61850_getVersionString());
 
     iedServer = IedServer_create(&iedModel);
@@ -235,7 +235,7 @@ main(int argc, char** argv)
     IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO7,
             (ControlHandler) controlHandlerForBinaryOutput,
             IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO7);
- 
+
      IedServer_setPerformCheckHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO8, checkHandler,
             IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO8);
 
