@@ -193,8 +193,8 @@ int
 main(int argc, char** argv)
 {
 
-    openlog("IEC61850 APP", LOG_PID|LOG_CONS, LOG_USER);
-    syslog(LOG_ERR,"Started IEC61850 App %s\n", LibIEC61850_getVersionString());
+    openlog("IEC61850_APP", LOG_PID|LOG_CONS, LOG_USER);
+    syslog(LOG_ERR,"Started IEC61850 App %s \n", LibIEC61850_getVersionString());
 
     iedServer = IedServer_create(&iedModel);
 
@@ -215,32 +215,18 @@ main(int argc, char** argv)
             (ControlHandler) controlHandlerForBinaryOutput,
             IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO4);
 
-/*
-*CONTROL STUFF
-*/
-
-
-    /* Install handler for operate command */
     IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6,
             (ControlHandler) controlHandlerForBinaryOutput,
             IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6);
 
-    /*
-     * For SPCSO1 we want the user be able to change the control model by online service -
-     * so we install a write access handler to change the control model when the client
-     * writes to the "ctlModel" attribute.
-     */
     IedServer_handleWriteAccess(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6_ctlModel, writeAccessHandler, NULL);
-
 
     IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO2,
             (ControlHandler) controlHandlerForBinaryOutput,
             IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO2);
 
-    /* this is optional - performs operative checks */
     IedServer_setPerformCheckHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO2, checkHandler,
             IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO2);
-
 
     IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO6,
             (ControlHandler) controlHandlerForBinaryOutput,
@@ -250,19 +236,15 @@ main(int argc, char** argv)
             (ControlHandler) controlHandlerForBinaryOutput,
             IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO7);
  
-    /* this is optional - performs operative checks */
-    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO8, checkHandler,
+     IedServer_setPerformCheckHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO8, checkHandler,
             IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO8);
-
 
     IedServer_setControlHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO9,
             (ControlHandler) controlHandlerForBinaryOutput,
             IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO9);
 
-    /* this is optional - performs operative checks */
     IedServer_setPerformCheckHandler(iedServer, IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO9, checkHandler,
             IEDMODEL_SIMENS_RC7_A_GGIO1_SPCSO9);
-
 
     IedServer_setConnectionIndicationHandler(iedServer, (IedConnectionIndicationHandler) connectionHandler, NULL);
     LogStorage statusLog = SqliteLogStorage_createInstance("log_status.db");
@@ -271,21 +253,19 @@ main(int argc, char** argv)
 
 #if 1
     uint64_t entryID = LogStorage_addEntry(statusLog, Hal_getTimeInMs());
-    MmsValue* value = MmsValue_newIntegerFromInt32(123);
+    MmsValue* value = MmsValue_newIntegerFromInt32(1);
     uint8_t blob[256];
     int blobSize = MmsValue_encodeMmsData(value, blob, 0, true);
 
-    LogStorage_addEntryData(statusLog, entryID, "simpleIOGenerioIO/GPIO1$ST$SPCSO1$stVal", blob, blobSize, 0);
+    LogStorage_addEntryData(statusLog, entryID, ",MAIN_BARKER/GPIO1$ST$SPCSO1$stVal", blob, blobSize, 0);
     MmsValue_delete(value);
     value = MmsValue_newUtcTimeByMsTime(Hal_getTimeInMs());
     blobSize = MmsValue_encodeMmsData(value, blob, 0, true);
     MmsValue_delete(value);
-    LogStorage_addEntryData(statusLog, entryID, "simpleIOGenerioIO/GPIO1$ST$SPCSO1$t", blob, blobSize, 0);
+    LogStorage_addEntryData(statusLog, entryID, ",ACTUATOR_1/GPIO1$ST$SPCSO1$t", blob, blobSize, 0);
     LogStorage_getEntries(statusLog, 0, Hal_getTimeInMs(), entryCallback, (LogEntryDataCallback) entryDataCallback, NULL);
 #endif
 
-
-    /* MMS server will be instructed to start listening to client connections. */
     IedServer_start(iedServer, 102);
 
     if (!IedServer_isRunning(iedServer)) {
