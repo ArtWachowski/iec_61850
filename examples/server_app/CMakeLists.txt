@@ -7,8 +7,8 @@ include_directories(
    ${CMAKE_SOURCE_DIR}/third_party/sqlite
 )
 
-set(server_example_SRCS
-   server_example_logging.c
+set(server_app_SRCS
+   server_app.c
    static_model.c
    ${CMAKE_CURRENT_LIST_DIR}/../../src/logging/drivers/sqlite/log_storage_sqlite.c
 )
@@ -20,22 +20,22 @@ set(sqlite_SRCS
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION")
 
 IF(WIN32)
-set_source_files_properties(${server_example_SRCS}
+set_source_files_properties(${server_app_SRCS}
                                        PROPERTIES LANGUAGE CXX)
 ENDIF(WIN32)
 
-add_executable(server_example_logging
-  ${server_example_SRCS}
+add_executable(server_app
+  ${server_app_SRCS}
   ${sqlite_SRCS}
 )
 
-target_link_libraries(server_example_logging
+target_link_libraries(server_app
     iec61850
 )
 
 ELSE()
 
-message("server-example-logging: sqlite not found")
+message("server-app: sqlite not found")
 
 ENDIF()
 
