@@ -6,24 +6,16 @@ Cybersecurity Project
 - Machine Learing - Inteligent IDS
 
 Dependencies:
-apt-get update
-apt-get install libsqlite3-dev
-apt-get install build-essential
-apt-get install iptables-persistent
-apt-get install git
-apt-get install tcpdump
-apt-get install python3-pip
-apt-get install doxygen
-apt-get install cmake
-apt-get install swig
+-apt-get update
+apt-get install libsqlite3-dev build-essential iptables-persistent git tcpdump python3-pip doxygen cmake swig 
 
-Installation:
-cd opt
-git clone https://github.com/ArtWachowski/iec_61850.git
-cd iec_61850
-cmake -DBUILD_PYTHON_BINDINGS=ON 
-make examples
-cp /opt/iec_61850/examples/server_app/server_app /usr/bin/
+installation:
+cd opt;
+git clone https://github.com/ArtWachowski/iec_61850.git;
+cd iec_61850;
+cmake -DBUILD_PYTHON_BINDINGS=ON; 
+make examples;
+cp /opt/iec_61850/examples/server_app/server_app /usr/bin/;
 
 Run:
 server_app
