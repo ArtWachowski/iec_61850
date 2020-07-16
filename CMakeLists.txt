@@ -29,12 +29,12 @@ set(CONFIG_MMS_MAXIMUM_PDU_SIZE "65000" CACHE STRING "Configure the maximum size
 set(CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS 5 CACHE STRING "Configure the maximum number of clients allowed to connect to the server")
 
 option(BUILD_EXAMPLES "Build the examples" ON)
-option(BUILD_PYTHON_BINDINGS "Build Python bindings" OFF)
+option(BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
 
 option(CONFIG_MMS_SINGLE_THREADED "Compile for single threaded version" ON)
 option(CONFIG_MMS_THREADLESS_STACK "Optimize stack for threadless operation (warning: single- or multi-threaded server will not work!)" OFF)
 option(CONFIG_ACTIVATE_TCP_KEEPALIVE "Activate TCP keepalive" ON)
-option(CONFIG_INCLUDE_GOOSE_SUPPORT "Build with GOOSE support" ON)
+option(CONFIG_INCLUDE_GOOSE_SUPPORT "Build with GOOSE support" OFF)
 
 # choose the library features which shall be included
 option(CONFIG_IEC61850_CONTROL_SERVICE "Build with support for IEC 61850 control features" ON)
@@ -46,7 +46,7 @@ option(CONFIG_IEC61850_SUPPORT_USER_READ_ACCESS_CONTROL "Allow user provided cal
 set(CONFIG_REPORTING_DEFAULT_REPORT_BUFFER_SIZE "65536" CACHE STRING "Default buffer size for buffered reports in byte" )
 
 # advanced options
-option(DEBUG "Enable debugging mode (include assertions)" ON)
+option(DEBUG "Enable debugging mode (include assertions)" OFF)
 option(DEBUG_SOCKET "Enable printf debugging for socket layer" ${DEBUG})
 option(DEBUG_COTP "Enable COTP printf debugging" ${DEBUG})
 option(DEBUG_ISO_SERVER "Enable ISO SERVER printf debugging" ${DEBUG})
@@ -76,7 +76,7 @@ include_directories(
 )
 
 set(API_HEADERS
-	hal/inc/hal_base.h
+    hal/inc/hal_base.h
     hal/inc/hal_time.h
     hal/inc/hal_thread.h
     hal/inc/hal_filesystem.h
