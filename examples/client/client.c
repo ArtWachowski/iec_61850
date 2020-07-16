@@ -11,8 +11,7 @@
 #include <time.h>
 #include "hal_thread.h"
 
-static void
-printJournalEntries(LinkedList journalEntries)
+static void printJournalEntries(LinkedList journalEntries)
 {
     char buf[1024];
 
