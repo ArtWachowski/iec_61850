@@ -18,11 +18,10 @@ Setup:
 - make install
 - cp examples/server_app/server_app /usr/bin/;
 - server_app &
-- echo 'Finished';
-
-Problemes with LD's ?? 
 - LD_LIBRARY_PATH=/usr/local/lib
 - export LD_LIBRARY_PATH
+- echo 'Finished';
+
 
 Run:
 server_app
