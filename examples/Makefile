@@ -1,5 +1,4 @@
-EXAMPLE_DIRS = client
-EXAMPLE_DIRS += mms_utility
+EXAMPLE_DIRS = mms_utility
 EXAMPLE_DIRS += server_app
 
 MODEL_DIRS += server_app
