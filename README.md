@@ -16,7 +16,7 @@ Setup:
 - cmake -DBUILD_PYTHON_BINDINGS=ON -DBUILD_EXAMPLES=ON -DDEBUG=OFF . 
 - make 
 - make install
-- cp examples/server_app /usr/bin/;
+- cp examples/server_app/server_app /usr/bin/;
 - server_app &
 - echo 'Finished';
 
