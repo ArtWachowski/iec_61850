@@ -21,7 +21,6 @@ Setup:
 Problemes with LD's ?? 
 - LD_LIBRARY_PATH=/usr/local/lib
 - export LD_LIBRARY_PATH
-Ref: https://stackoverflow.com/questions/480764/linux-error-while-loading-shared-libraries-cannot-open-shared-object-file-no-s
 
 Run:
 server_app
