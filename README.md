@@ -1,27 +1,31 @@
 ## Overview
 
-Cybersecurity Project
-- IEC61850 Server_APP + Test Client 'Server app is a frankenstein of multiple server_examples' 
-- IDS _ Snort Dynamis Pre_Processor Extension
+Road Map - IEC61850_CS Project
+- IEC61850 Server_APP + Test Client 'Server app is a frankenstein of multiple server_examples so as client, programming pathology' 
+- IDS _ Snort Dynamic Pre_Processor IEC61850 extension - basic detection 
 - Machine Learing - Inteligent IDS
 
 Dependencies:
 - apt-get update
 - apt-get install libsqlite3-dev build-essential iptables-persistent git tcpdump python3-pip doxygen cmake swig 
 
-Installation:
+Setup:
 - cd opt;
 - git clone https://github.com/ArtWachowski/iec_61850.git;
 - cd iec_61850;
-- cmake -DBUILD_PYTHON_BINDINGS=ON; 
-- make examples;
+- make clean* - to remove old stuff
+- make examples; 
 - cp /opt/iec_61850/examples/server_app/server_app /usr/bin/;
 
-Install CMAKE Python  
-- cmake -DBUILD_PYTHON_BINDINGS=ON -DBUILD_EXAMPLES=OFF
+Install python links  
+- cmake -DBUILD_PYTHON_BINDINGS=ON -DBUILD_EXAMPLES=OFF (TODO Building Client app is failing) 
 - make 
 - make install
 
+Problemes with LD's ?? 
+- LD_LIBRARY_PATH=/usr/local/lib
+- export LD_LIBRARY_PATH
+Ref: https://stackoverflow.com/questions/480764/linux-error-while-loading-shared-libraries-cannot-open-shared-object-file-no-s
 
 Run:
 server_app
