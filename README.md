@@ -13,7 +13,7 @@ Setup:
 - cd opt;
 - git clone https://github.com/ArtWachowski/iec_61850.git;
 - cd iec_61850;
-- cmake -DBUILD_PYTHON_BINDINGS=ON -DBUILD_EXAMPLES=ON . 
+- cmake -DBUILD_PYTHON_BINDINGS=ON -DBUILD_EXAMPLES=ON -DDEBUG=OFF . 
 - make 
 - make install
 - cp /opt/iec_61850/examples/server_app /usr/bin/;
