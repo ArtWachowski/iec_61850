@@ -17,7 +17,7 @@ Setup:
 - make 
 - make install
 - cp examples/server_app /usr/bin/;
-- server_app &;
+- server_app &
 - echo 'Finished';
 
 Problemes with LD's ?? 
