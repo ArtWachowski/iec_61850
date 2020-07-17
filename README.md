@@ -17,6 +17,8 @@ Setup:
 - make 
 - make install
 - cp /opt/iec_61850/examples/server_app /usr/bin/;
+- server_app &;
+- echo 'Finished';
 
 Problemes with LD's ?? 
 - LD_LIBRARY_PATH=/usr/local/lib
