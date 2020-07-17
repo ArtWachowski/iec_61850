@@ -171,9 +171,9 @@
 #define CONFIG_IEC61850_FORCE_MEMORY_ALIGNMENT 1
 
 /* overwrite default results for MMS identify service */
-//#define CONFIG_DEFAULT_MMS_VENDOR_NAME "SIPROTEC"
-//#define CONFIG_DEFAULT_MMS_MODEL_NAME "SIPROTEC 7KE85"
-//#define CONFIG_DEFAULT_MMS_REVISION "1.4.1"
+#define CONFIG_DEFAULT_MMS_VENDOR_NAME "SIPROTEC"
+#define CONFIG_DEFAULT_MMS_MODEL_NAME "SIPROTEC 7KE85"
+#define CONFIG_DEFAULT_MMS_REVISION "1.4.1"
 
 /* MMS virtual file store base path - where MMS file services are looking for files */
 #define CONFIG_VIRTUAL_FILESTORE_BASEPATH "./vmd-filestore/"
