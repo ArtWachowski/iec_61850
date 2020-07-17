@@ -13,10 +13,10 @@ Setup:
 - cd opt;
 - git clone https://github.com/ArtWachowski/iec_61850.git;
 - cd iec_61850;
-- cp /opt/iec_61850/examples/server_app/server_app /usr/bin/;
 - cmake -DBUILD_PYTHON_BINDINGS=ON -DBUILD_EXAMPLES=ON . 
 - make 
 - make install
+- cp /opt/iec_61850/examples/server_app /usr/bin/;
 
 Problemes with LD's ?? 
 - LD_LIBRARY_PATH=/usr/local/lib
