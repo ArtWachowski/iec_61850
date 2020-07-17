@@ -16,7 +16,7 @@ Setup:
 - cmake -DBUILD_PYTHON_BINDINGS=ON -DBUILD_EXAMPLES=ON -DDEBUG=OFF . 
 - make 
 - make install
-- cp /opt/iec_61850/examples/server_app /usr/bin/;
+- cp examples/server_app /usr/bin/;
 - server_app &;
 - echo 'Finished';
 
