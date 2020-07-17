@@ -1,9 +1,9 @@
 ## Overview
+IEC61850_CyberSecurity Project
 
-Road Map - IEC61850_CS Project
-- IEC61850 Server_APP + Test Client 'Server app is a frankenstein of multiple server_examples so as client, programming pathology' 
+- IEC61850 Server_APP 
 - IDS _ Snort Dynamic Pre_Processor IEC61850 extension - basic detection 
-- Machine Learing - Inteligent IDS
+- Machine Learing - Inteligent IEC61850 CS threat detection 
 
 Dependencies:
 - apt-get update
@@ -13,12 +13,8 @@ Setup:
 - cd opt;
 - git clone https://github.com/ArtWachowski/iec_61850.git;
 - cd iec_61850;
-- make clean* - to remove old stuff
-- make examples; 
 - cp /opt/iec_61850/examples/server_app/server_app /usr/bin/;
-
-Install python links  
-- cmake -DBUILD_PYTHON_BINDINGS=ON -DBUILD_EXAMPLES=OFF (TODO Building Client app is failing) 
+- cmake -DBUILD_PYTHON_BINDINGS=ON -DBUILD_EXAMPLES=ON . 
 - make 
 - make install
 
