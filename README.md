@@ -6,7 +6,8 @@ IEC61850_CyberSecurity Project
 
 Dependencies:
 - apt-get update
-- apt-get install libsqlite3-dev build-essential iptables-persistent git tcpdump python3-pip doxygen cmake swig 
+- apt-get install libsqlite3-dev build-essential iptables-persistent git tcpdump python3-pip doxygen cmake swig
+- apt-get install autoconf automake libtool pkg-config libpcap-dev scapy
 
 Setup:
 - cd opt;
