@@ -2,8 +2,7 @@
 IEC61850_CyberSecurity Project
 
 - IEC61850 Server_APP 
-- IDS _ Snort Dynamic Pre_Processor IEC61850 extension - basic detection 
-- Machine Learing - Inteligent IEC61850 CS threat detection 
+- IDS _  IEC61850 CS threat detection model
 
 Dependencies:
 - apt-get update
