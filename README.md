@@ -21,8 +21,9 @@ Setup:
 - server_app &
 - LD_LIBRARY_PATH=/usr/local/lib
 - export LD_LIBRARY_PATH
+- cd CC_SNIFFER
 - gcc cc_sniffer.c -o cc_sniffer -I/usr/include/python3.6m -lpython3.6m
-- cp examples/server_app/cc_sniffer /usr/bin/;
+- cp iec61850/cc_sniffer /usr/bin/;
 - echo 'Finished';
 
 Run IEC61850_pot:
