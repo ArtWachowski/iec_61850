@@ -8,7 +8,7 @@ Dependencies:
 - apt-get update
 - apt-get install libsqlite3-dev build-essential iptables-persistent git tcpdump python3-pip doxygen cmake swig
 - apt-get install autoconf automake libtool pkg-config libpcap-dev python3-pip
-- pip3 install scapy nfstream  #https://www.nfstream.org/
+- pip3 install pandas sklearn numpy sklearn-deltatfidf
 
 Setup:
 - cd opt;
@@ -21,11 +21,15 @@ Setup:
 - server_app &
 - LD_LIBRARY_PATH=/usr/local/lib
 - export LD_LIBRARY_PATH
+- gcc cc_sniffer.c -o cc_sniffer -I/usr/include/python3.6m -lpython3.6m
+- cp examples/server_app/cc_sniffer /usr/bin/;
 - echo 'Finished';
 
-
-Run:
+Run IEC61850_pot:
 server_app
+
+Run cc_snifer tool:
+cc_sniffer
 
 
 libiec61850 is an open-source (GPLv3) implementation of an IEC 61850 client and server library implementing the protocols MMS, GOOSE and SV. 
