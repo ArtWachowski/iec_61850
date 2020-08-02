@@ -1,14 +1,18 @@
 ## Overview
-IEC61850_CyberSecurity Project
+IEC61850_CyberSecurity Project - Machine Learning based Intrusion Detection System for IEC61850-MMS Profile
 
-- IEC61850 Server_APP 
-- IDS _  IEC61850 CS threat detection model
+Contents:
+- Server_APP - High-interaction Honeypot 
+- Inline Machine Learning based detection tool 
+- AttackClient 
 
-Dependencies:
+Tested on Debian Linux - Ubuntu and Rpi3  
+
+Prerequisities:
 - apt-get update
 - apt-get install libsqlite3-dev build-essential iptables-persistent git tcpdump python3-pip doxygen cmake swig
 - apt-get install autoconf automake libtool pkg-config libpcap-dev python3-pip
-- pip3 install pandas sklearn numpy sklearn-deltatfidf
+- pip3 install pandas sklearn numpy sklearn-deltatfidf cffi pickle
 
 Setup:
 - cd opt;
@@ -32,10 +36,6 @@ server_app
 Run cc_snifer tool:
 cc_sniffer
 
+Run attackclient.py from iec61850 directory. 
 
-libiec61850 is an open-source (GPLv3) implementation of an IEC 61850 client and server library implementing the protocols MMS, GOOSE and SV. 
-It is implemented in C (according to the C99 standard) to provide maximum portability. 
-It can be used to implement IEC 61850 compliant client and server applications on embedded systems and PCs running Linux, Windows, and MacOS. 
-Included is a set of simple example applications that can be used as a starting point to implement own IEC 61850 compliant devices or to communicate with IEC 61850 devices. 
-The library has been successfully used in many commercial software products and devices. 
-- IEC61850 credit goes to MZ_Autoimation
+libiec61850 is an open-source (GPLv3) implementation of an IEC 61850 client and server library implementing the protocols MMS, GOOSE and SV, credit goes to MZ_Autoimation.
