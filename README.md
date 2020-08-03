@@ -12,7 +12,7 @@ Prerequisities:
 - apt-get update
 - apt-get install libsqlite3-dev build-essential iptables-persistent git tcpdump python3-pip doxygen cmake swig
 - apt-get install autoconf automake libtool pkg-config libpcap-dev python3-pip
-- pip3 install pandas sklearn numpy sklearn-deltatfidf cffi pickle
+- pip3 install pandas sklearn numpy sklearn-deltatfidf cffi pickle argparse
 
 Setup:
 - cd opt;
