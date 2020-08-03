@@ -25,7 +25,7 @@ Setup:
 - server_app &
 - LD_LIBRARY_PATH=/usr/local/lib
 - export LD_LIBRARY_PATH
-- cd CC_SNIFFER
+- cd CC_SNIFER
 - gcc cc_sniffer.c -o cc_sniffer -I/usr/include/python3.6m -lpython3.6m
 - cp iec61850/cc_sniffer /usr/bin/;
 - echo 'Finished';
