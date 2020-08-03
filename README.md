@@ -3,7 +3,7 @@ IEC61850_CyberSecurity Project - Machine Learning based Intrusion Detection Syst
 
 Contents:
 - Server_APP - High-interaction Honeypot 
-- Inline Machine Learning based detection tool 
+- Machine Learning based detection tool 
 - AttackClient 
 
 Tested on Debian Linux - Ubuntu and Rpi3  
