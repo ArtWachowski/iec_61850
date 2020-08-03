@@ -11,8 +11,8 @@ Tested on Debian Linux - Ubuntu and Rpi3
 Prerequisities:
 - apt-get update
 - apt-get install libsqlite3-dev build-essential iptables-persistent git tcpdump python3-pip doxygen cmake swig
-- apt-get install autoconf automake libtool pkg-config libpcap-dev python3-pip libpython3.6-dev python3-dev
-- pip3 install pandas sklearn numpy sklearn-deltatfidf cffi pickle argparse
+- apt-get install autoconf automake libtool pkg-config libpcap-dev python3-pip python3-dev
+- pip3 install pandas sklearn numpy sklearn-deltatfidf cffi argparse
 
 Setup:
 - cd opt;
