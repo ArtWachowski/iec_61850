@@ -1,6 +1,7 @@
 #include<netinet/in.h>
 #include<errno.h>
 #include<netdb.h>
+#include<signal.h>
 #include<stdio.h>	//For standard things
 #include<stdlib.h>	//malloc
 #include<string.h>	//strlen
@@ -28,21 +29,29 @@ _Bool starts_with(unsigned char*, unsigned char* , int);
 
 FILE *logfile;
 struct sockaddr_in source,dest;
-int tcp=0,dst_p=102,src_p=102,others=0,id=1,total=0,mms=0,und=0,i,j,src,dst,c=0;
+int sock_raw,tcp=0,dst_p=102,src_p=102,others=0,id=1,total=0,mms=0,und=0,i,j,src,dst,c=0;
 char ifce[] ="ens33";
 char ml_string[] ="";
-//char ml_payload[]="";
+
+void sigint_handler(int signum) { //Handler for SIGINT
+	signal(SIGINT, sigint_handler);
+	printf("Stopped using Ctrl+C \n");
+	close(sock_raw);
+	exit(EXIT_SUCCESS);
+}
 
 int main(int argc, char *argv[])
 {
+	signal(SIGINT, sigint_handler);
+
 	Py_Initialize();
 	wchar_t *name = Py_DecodeLocale(argv[0], NULL);
 	Py_SetProgramName(name); 
 
 	int saddr_size , data_size;
 	struct sockaddr saddr;
-		
-	unsigned char *buffer = (unsigned char *) malloc(65536);
+
+	//unsigned char *buffer = (unsigned char *) malloc(65536);
 	
 	logfile=fopen("log.txt","w");
 	if(logfile==NULL) 
@@ -51,7 +60,7 @@ int main(int argc, char *argv[])
 	}
 	printf("Starting...\n");
 	
-	int sock_raw = socket( AF_PACKET , SOCK_RAW , htons(ETH_P_ALL)) ;
+	sock_raw = socket( AF_PACKET , SOCK_RAW , htons(ETH_P_ALL)) ;
 	setsockopt(sock_raw , SOL_SOCKET , SO_BINDTODEVICE , ifce , strlen(ifce)+ 1 );
 	
 	if(sock_raw < 0)
@@ -60,8 +69,10 @@ int main(int argc, char *argv[])
 		perror("Socket Error");
 		return 1;
 	}
+
 	while(1)
 	{
+		unsigned char *buffer = (unsigned char *) malloc(10000);
 		saddr_size = sizeof saddr;
 		//Receive a packet
 		data_size = recvfrom(sock_raw , buffer , 65536 , 0 , &saddr , (socklen_t*)&saddr_size);
@@ -71,11 +82,11 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 		//Now process the packet
-		ProcessPacket(buffer , data_size);
+		ProcessPacket(buffer,data_size);
+		free(buffer);
 	}
 	Py_Finalize();
-	close(sock_raw);
-	printf("Finished");
+	printf("Finished");	
 	return 0;
 }
 
@@ -121,7 +132,7 @@ void process_tcp(unsigned char* Buffer, int Size)
 	struct ethhdr *eth = (struct ethhdr *)Buffer;
 	struct iphdr *iph = (struct iphdr *)(Buffer  + sizeof(struct ethhdr) );
 	iphdrlen =iph->ihl*4;
-
+	
 	memset(&source, 0, sizeof(source));
 	source.sin_addr.s_addr = iph->saddr;
 	memset(&dest, 0, sizeof(dest));
@@ -141,6 +152,7 @@ void process_tcp(unsigned char* Buffer, int Size)
 	char dst_ip[16];
 	char src_port[6];
 	char dst_port[6];
+	char ttl[4];
 	char ml_packet[Size];
 	
 	//TODO Strip ISO Headers: TKPT COTP ...  
@@ -154,6 +166,8 @@ void process_tcp(unsigned char* Buffer, int Size)
 		++others;
 
 	} else if (starts_with(ml_payload,TPKT, sizeof TPKT)){
+
+		//printf("Lenght od ml_payload is %ld\n",sizeof(ml_payload)); //API errors with handling ml_payload 
 		++mms;
 		sprintf(src_mac, "%02x:%02x:%02x:%02x:%02x:%02x",eth->h_source[0] , eth->h_source[1] , eth->h_source[2] , eth->h_source[3] , eth->h_source[4] , eth->h_source[5]);
 		sprintf(dst_mac, "%02x:%02x:%02x:%02x:%02x:%02x",eth->h_dest[0] , eth->h_dest[1] , eth->h_dest[2] , eth->h_dest[3] , eth->h_dest[4] , eth->h_dest[5]);
@@ -161,17 +175,22 @@ void process_tcp(unsigned char* Buffer, int Size)
 		sprintf(dst_ip, "%s",inet_ntoa(dest.sin_addr));
 		sprintf(src_port, "%u",ntohs(tcph->source));
 		sprintf(dst_port, "%u",ntohs(tcph->dest));
-	        snprintf(ml_packet, sizeof(ml_packet), "%s,%s,%s,%s,%s,%s,%s",src_mac,dst_mac,src_ip,dst_ip,src_port,dst_port,ml_payload);
+		sprintf(ttl,"%d",iph->ttl);
+	        snprintf(ml_packet, sizeof(ml_packet), "%s,%s,%s,%s,%s,%s,%s,%d,%s",src_mac,dst_mac,src_ip,dst_ip,src_port,dst_port,ttl,id,ml_payload);
  		char *ml_result = get_prediction(ml_packet , Size); //result from ML
  		//printf("ID: %d ML_Packet: %s ML_Result: %s\n",id,ml_packet,ml_result);
 		fprintf(logfile , "ID: %d ML_Packet: %s ML_Result: %s\n",id,ml_packet,ml_result); //added result of verification 
 		++id;
 	} else {++und;}
+
+	//TODO Return the result and rasi alarm 
+
 }
 
 char *raw_payload(unsigned char* data , int Size)
 {
-	unsigned char *ml_payload = (unsigned char *) malloc(10000);
+	unsigned char *ml_payload = (unsigned char *) malloc(65535); // free(): invalid next size (normal) Aborted (core dumped)
+
 	ml_payload[0] = '\0';	
 	int i;
 
@@ -186,16 +205,19 @@ char *raw_payload(unsigned char* data , int Size)
 
 _Bool starts_with(unsigned char* payload_string, unsigned char* header_cmp, int Size)
 {
-	char substr[Size];
-	strncpy(substr,payload_string, Size);
+	//char substr[Size]; strncpy(substr,payload_string, Size); // free(): invalid next size (normal) Aborted (core dumped)
+	unsigned char* substr = calloc(strlen(payload_string) + 1, 1);
+	strcpy(substr,payload_string);
 
 	//printf("Prefix %s String %s\n",header_cmp, substr);
 	while(*header_cmp)
     	{
 		if(*header_cmp++ != *payload_string++)
+			//free(substr);
 			return 0;
 	}
 
+	//free(substr);
 	return 1;
 }
 
