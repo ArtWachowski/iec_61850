@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 	int saddr_size , data_size;
 	struct sockaddr saddr;
 
-	//unsigned char *buffer = (unsigned char *) malloc(65536);
+	unsigned char *buffer = (unsigned char *) malloc(65536);
 	
 	logfile=fopen("log.txt","w");
 	if(logfile==NULL) 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
 	while(1)
 	{
-		unsigned char *buffer = (unsigned char *) malloc(10000);
+		//unsigned char *buffer = (unsigned char *) malloc(65536);
 		saddr_size = sizeof saddr;
 		//Receive a packet
 		data_size = recvfrom(sock_raw , buffer , 65536 , 0 , &saddr , (socklen_t*)&saddr_size);
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 		}
 		//Now process the packet
 		ProcessPacket(buffer,data_size);
-		free(buffer);
+		//free(buffer);
 	}
 	Py_Finalize();
 	printf("Finished");	
@@ -107,7 +107,7 @@ void ProcessPacket(unsigned char* buffer, int size)
 
 	//TODO Introduce Flow inspections instead of individual packet ins ...
 
-        if(src == src_p || dst == dst_p ) //if 102 ...
+        if (dst == dst_p ) //if 102 .  src == src_p || ..(src == src_p) //
 	{   
 		++total;
 		switch (iph->protocol) //Check the Protocol and do accordingly...
