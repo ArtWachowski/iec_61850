@@ -26,7 +26,7 @@ Setup:
 - LD_LIBRARY_PATH=/usr/local/lib
 - export LD_LIBRARY_PATH
 - cd CC_SNIFER
-- gcc cc_sniffer.c -o cc_sniffer -I/usr/include/python3.6m -lpython3.6m //Check python3 --version
+- gcc cc_sniffer.c -o cc_sniffer -I /usr/include/python3.8 -lpython3.8  //Check python3 --version
 - cp iec61850/cc_sniffer /usr/bin/;
 - echo 'Finished';
 
