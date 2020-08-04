@@ -46,7 +46,7 @@ def get_prediction(buffer, buffer_len):
                 
         except:
             print('API C_Input ml_processing!')
-            traceback.print_exc()
+            #traceback.print_exc()
             result = ffi.new('char []', b"Failed")  ### New message 
             noGCDict[ffi.addressof(result)] = result
             return result
@@ -86,7 +86,7 @@ def ml_processing(data,traffic_type):
         data = data.split(b',')
         ml_packet = [f.decode(encoding='utf-8', errors='strict') for f in data]
 
-        if len(ml_packet) <= 6: # TODO Fix MMS on C side
+        if len(ml_packet[8]) <= 6: # TODO Fix MMS on C side
             print("ML Packet must be minimum 6 len: ", len(ml_packet) )
             print("\ Python ML_bytes.......", ml_bytes) 
             return
