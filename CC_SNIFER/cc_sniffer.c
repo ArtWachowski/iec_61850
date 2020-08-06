@@ -2,6 +2,7 @@
 #include<errno.h>
 #include<netdb.h>
 #include<signal.h>
+#include<pcap.h>
 #include<stdio.h>	//For standard things
 #include<stdlib.h>	//malloc
 #include<string.h>	//strlen
@@ -22,15 +23,14 @@
 struct API api;
 
 char * get_prediction(unsigned char*, int);
-void ProcessPacket(unsigned char* , int);
-void process_tcp(unsigned char * , int );
+void ProcessPacket(unsigned char* , int, unsigned char*);
+void process_tcp(unsigned char * , int, unsigned char*);
 char * raw_payload(unsigned char* , int);
 _Bool starts_with(unsigned char*, unsigned char* , int);
 
 FILE *logfile;
 struct sockaddr_in source,dest;
 int sock_raw,tcp=0,dst_p=102,src_p=102,others=0,id=1,total=0,mms=0,und=0,i,j,src,dst,c=0;
-char ifce[] ="ens33";
 char ml_string[] ="";
 
 void sigint_handler(int signum) { //Handler for SIGINT
@@ -43,6 +43,12 @@ void sigint_handler(int signum) { //Handler for SIGINT
 int main(int argc, char *argv[])
 {
 	signal(SIGINT, sigint_handler);
+
+	char *dev = argv[1];
+	if (dev == NULL) {
+		printf("Please provide int name ./cc_snifer eth0 \n");
+		return(0);
+	}
 
 	Py_Initialize();
 	wchar_t *name = Py_DecodeLocale(argv[0], NULL);
@@ -58,10 +64,10 @@ int main(int argc, char *argv[])
 	{
 		printf("Unable to create log.txt file.");
 	}
-	printf("Starting...\n");
+	printf("Starting... device: %s\n", dev);
 	
 	sock_raw = socket( AF_PACKET , SOCK_RAW , htons(ETH_P_ALL)) ;
-	setsockopt(sock_raw , SOL_SOCKET , SO_BINDTODEVICE , ifce , strlen(ifce)+ 1 );
+	setsockopt(sock_raw , SOL_SOCKET , SO_BINDTODEVICE , dev , strlen(dev)+ 1 );
 	
 	if(sock_raw < 0)
 	{
@@ -82,7 +88,7 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 		//Now process the packet
-		ProcessPacket(buffer,data_size);
+		ProcessPacket(buffer,data_size,dev);
 		//free(buffer);
 	}
 	Py_Finalize();
@@ -90,16 +96,25 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-void ProcessPacket(unsigned char* buffer, int size)
+void ProcessPacket(unsigned char* buffer, int size, unsigned char* dev)
 {
 	unsigned short iphdrlen;
 
+	unsigned short ethlen;
+
+	ethlen = sizeof(struct ethhdr);
+
+	if(strcmp( dev, "ppp0") == 0){
+
+		ethlen = 16;
+	}
+	
 	//Get the IP Header part of this packet , excluding the ethernet header
-	struct iphdr *iph = (struct iphdr*)(buffer + sizeof(struct ethhdr));
+	struct iphdr *iph = (struct iphdr*)(buffer + ethlen);
 
 	iphdrlen = iph->ihl*4;
 	
-	struct tcphdr *tcph=(struct tcphdr*)(buffer + iphdrlen + sizeof(struct ethhdr));
+	struct tcphdr *tcph=(struct tcphdr*)(buffer + iphdrlen + ethlen);
 	dst = ntohs(tcph->dest);
 	src = ntohs(tcph->source);
 	
@@ -114,7 +129,7 @@ void ProcessPacket(unsigned char* buffer, int size)
 		{
 			case 6:  //TCP Protocol
 				++tcp;
-				process_tcp(buffer , size);
+				process_tcp(buffer , size, dev);
 				break;
 		
 			default: //Some Other Protocol like ARP etc.
@@ -126,11 +141,18 @@ void ProcessPacket(unsigned char* buffer, int size)
 	}
 }
 
-void process_tcp(unsigned char* Buffer, int Size)
+void process_tcp(unsigned char* Buffer, int Size,unsigned char* dev)
 {
 	unsigned short iphdrlen;
-	struct ethhdr *eth = (struct ethhdr *)Buffer;
-	struct iphdr *iph = (struct iphdr *)(Buffer  + sizeof(struct ethhdr) );
+
+	unsigned short ethlen = 16;
+
+	if(strcmp( dev, "ppp0") != 0){  //hot fixes :D days before submission 
+		struct ethhdr *eth = (struct ethhdr *)Buffer;
+		ethlen = sizeof(struct ethhdr);
+	}
+
+	struct iphdr *iph = (struct iphdr *)(Buffer  + ethlen);
 	iphdrlen =iph->ihl*4;
 	
 	memset(&source, 0, sizeof(source));
@@ -138,16 +160,16 @@ void process_tcp(unsigned char* Buffer, int Size)
 	memset(&dest, 0, sizeof(dest));
 	dest.sin_addr.s_addr = iph->daddr;
 
-	struct tcphdr *tcph=(struct tcphdr*)(Buffer + iphdrlen + sizeof(struct ethhdr));
+	struct tcphdr *tcph=(struct tcphdr*)(Buffer + iphdrlen + ethlen);
 			
-	int header_size =  sizeof(struct ethhdr) + iphdrlen + tcph->doff*4;
+	int header_size =  ethlen + iphdrlen + tcph->doff*4;
 		
 	char *ml_payload = raw_payload(Buffer + header_size , Size - header_size );
 
 	char KEEPALIVE[] = "0000";
 	char TPKT[] = "0300";
-	char src_mac[19];
-	char dst_mac[19];
+	char src_mac[]= "00:00:00:00:00:00"; //ppp rulez 
+	char dst_mac[]= "00:00:00:00:00:00";
 	char src_ip[16];
 	char dst_ip[16];
 	char src_port[6];
@@ -169,8 +191,8 @@ void process_tcp(unsigned char* Buffer, int Size)
 
 		//printf("Lenght od ml_payload is %ld\n",sizeof(ml_payload)); //API errors with handling ml_payload 
 		++mms;
-		sprintf(src_mac, "%02x:%02x:%02x:%02x:%02x:%02x",eth->h_source[0] , eth->h_source[1] , eth->h_source[2] , eth->h_source[3] , eth->h_source[4] , eth->h_source[5]);
-		sprintf(dst_mac, "%02x:%02x:%02x:%02x:%02x:%02x",eth->h_dest[0] , eth->h_dest[1] , eth->h_dest[2] , eth->h_dest[3] , eth->h_dest[4] , eth->h_dest[5]);
+		//sprintf(src_mac, "%02x:%02x:%02x:%02x:%02x:%02x",eth->h_source[0] , eth->h_source[1] , eth->h_source[2] , eth->h_source[3] , eth->h_source[4] , eth->h_source[5]);
+		//sprintf(dst_mac, "%02x:%02x:%02x:%02x:%02x:%02x",eth->h_dest[0] , eth->h_dest[1] , eth->h_dest[2] , eth->h_dest[3] , eth->h_dest[4] , eth->h_dest[5]);
 		sprintf(src_ip, "%s",inet_ntoa(source.sin_addr));
 		sprintf(dst_ip, "%s",inet_ntoa(dest.sin_addr));
 		sprintf(src_port, "%u",ntohs(tcph->source));
