@@ -23,15 +23,16 @@
 struct API api;
 
 char * get_prediction(unsigned char*, int);
-void ProcessPacket(unsigned char* , int, unsigned char*);
-void process_tcp(unsigned char * , int, unsigned char*);
-char * raw_payload(unsigned char* , int);
+void ProcessPacket(u_char *, const struct pcap_pkthdr *, const u_char *);
+void process_tcp(const u_char * , int);
+char * raw_payload(const u_char * , int);
 _Bool starts_with(unsigned char*, unsigned char* , int);
 
 FILE *logfile;
 struct sockaddr_in source,dest;
 int sock_raw,tcp=0,dst_p=102,src_p=102,others=0,id=1,total=0,mms=0,und=0,i,j,src,dst,c=0;
 char ml_string[] ="";
+char dev[]="";
 
 void sigint_handler(int signum) { //Handler for SIGINT
 	signal(SIGINT, sigint_handler);
@@ -44,68 +45,73 @@ int main(int argc, char *argv[])
 {
 	signal(SIGINT, sigint_handler);
 
-	char *dev = argv[1];
-	if (dev == NULL) {
-		printf("Please provide int name ./cc_snifer eth0 \n");
-		return(0);
-	}
-
 	Py_Initialize();
 	wchar_t *name = Py_DecodeLocale(argv[0], NULL);
 	Py_SetProgramName(name); 
 
-	int saddr_size , data_size;
-	struct sockaddr saddr;
 
-	unsigned char *buffer = (unsigned char *) malloc(65536);
-	
+    	pcap_if_t *alldevsp , *device;
+    	pcap_t *handle; //Handle of the device that shall be sniffed
+ 
+   	char errbuf[100] , *devname , devs[100][100];
+    	int count = 1 , n;
+     
+    	printf("Finding available devices ... ");
+    	if( pcap_findalldevs( &alldevsp , errbuf) )
+    	{
+    	    printf("Error finding devices : %s" , errbuf);
+    	    exit(1);
+   	 }
+    	printf("Done");
+     
+    	printf("\nAvailable Devices are :\n");
+    	for(device = alldevsp ; device != NULL ; device = device->next)
+    	{
+        	printf("%d. %s - %s\n" , count , device->name , device->description);
+        	if(device->name != NULL)
+        	{
+            	strcpy(devs[count] , device->name);
+        	}
+        	count++;
+    	}
+     
+    	printf("Enter the number of the device you want to sniff : ");
+    	scanf("%d" , &n);
+    	devname = devs[n];
+
+	printf("\n Started... device: %s\n", devname);
+	strcpy(dev, devname);
+     
+
 	logfile=fopen("log.txt","w");
 	if(logfile==NULL) 
 	{
 		printf("Unable to create log.txt file.");
 	}
-	printf("Starting... device: %s\n", dev);
-	
-	sock_raw = socket( AF_PACKET , SOCK_RAW , htons(ETH_P_ALL)) ;
-	setsockopt(sock_raw , SOL_SOCKET , SO_BINDTODEVICE , dev , strlen(dev)+ 1 );
-	
-	if(sock_raw < 0)
-	{
-		//Print the error with proper message
-		perror("Socket Error");
-		return 1;
-	}
 
-	while(1)
-	{
-		//unsigned char *buffer = (unsigned char *) malloc(65536);
-		saddr_size = sizeof saddr;
-		//Receive a packet
-		data_size = recvfrom(sock_raw , buffer , 65536 , 0 , &saddr , (socklen_t*)&saddr_size);
-		if(data_size < 0 )
-		{
-			printf("Recvfrom error , failed to get packets\n");
-			return 1;
-		}
-		//Now process the packet
-		ProcessPacket(buffer,data_size,dev);
-		//free(buffer);
-	}
+    	handle = pcap_open_live(devname , 65536 , 1 , 0 , errbuf);
+     
+    	if (handle == NULL) 
+    	{
+        	fprintf(stderr, "Couldn't open device %s : %s\n" , devname , errbuf);
+        	exit(1);
+    	}
+    	pcap_loop(handle , -1 , ProcessPacket , NULL);
 	Py_Finalize();
 	printf("Finished");	
 	return 0;
 }
 
-void ProcessPacket(unsigned char* buffer, int size, unsigned char* dev)
+void ProcessPacket(u_char *args, const struct pcap_pkthdr *header, const u_char *buffer)
 {
 	unsigned short iphdrlen;
+	int size = header->len;
 
 	unsigned short ethlen;
 
 	ethlen = sizeof(struct ethhdr);
 
-	if(strcmp( dev, "ppp0") == 0){
-
+	if(strcmp( dev, "ppp0") == 0){  // LINKTYPE_LINUX_SLL	113	DLT_LINUX_SLL
 		ethlen = 16;
 	}
 	
@@ -129,7 +135,7 @@ void ProcessPacket(unsigned char* buffer, int size, unsigned char* dev)
 		{
 			case 6:  //TCP Protocol
 				++tcp;
-				process_tcp(buffer , size, dev);
+				process_tcp(buffer , size);
 				break;
 		
 			default: //Some Other Protocol like ARP etc.
@@ -141,7 +147,7 @@ void ProcessPacket(unsigned char* buffer, int size, unsigned char* dev)
 	}
 }
 
-void process_tcp(unsigned char* Buffer, int Size,unsigned char* dev)
+void process_tcp(const u_char * Buffer, int Size)
 {
 	unsigned short iphdrlen;
 
@@ -209,7 +215,7 @@ void process_tcp(unsigned char* Buffer, int Size,unsigned char* dev)
 
 }
 
-char *raw_payload(unsigned char* data , int Size)
+char *raw_payload(const u_char * data , int Size)
 {
 	unsigned char *ml_payload = (unsigned char *) malloc(65535); // free(): invalid next size (normal) Aborted (core dumped)
 
@@ -273,3 +279,4 @@ char *get_prediction(unsigned char* Buffer, int buffer)
 
 	return ml_result;
 }
+
