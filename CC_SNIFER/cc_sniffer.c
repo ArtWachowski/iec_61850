@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
  
    	char errbuf[100] , *devname , devs[100][100];
     	int count = 1 , n;
-     
+
     	printf("Finding available devices ... ");
     	if( pcap_findalldevs( &alldevsp , errbuf) )
     	{
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     	    exit(1);
    	 }
     	printf("Done");
-     
+
     	printf("\nAvailable Devices are :\n");
     	for(device = alldevsp ; device != NULL ; device = device->next)
     	{
@@ -74,14 +74,14 @@ int main(int argc, char *argv[])
         	}
         	count++;
     	}
-     
+
     	printf("Enter the number of the device you want to sniff : ");
     	scanf("%d" , &n);
     	devname = devs[n];
 
 	printf("\n Started... device: %s\n", devname);
 	strcpy(dev, devname);
-     
+
 
 	logfile=fopen("log.txt","w");
 	if(logfile==NULL) 
@@ -128,7 +128,7 @@ void ProcessPacket(u_char *args, const struct pcap_pkthdr *header, const u_char 
 
 	//TODO Introduce Flow inspections instead of individual packet ins ...
 
-        if (dst == dst_p ) //if 102 .  src == src_p || ..(src == src_p) //
+        if (dst == dst_p ) //(src == src_p)  //(dst == dst_p ) //if 102 .  src == src_p || ..(src == src_p) //
 	{   
 		++total;
 		switch (iph->protocol) //Check the Protocol and do accordingly...
