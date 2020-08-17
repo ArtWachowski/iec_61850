@@ -14,7 +14,7 @@ Prerequisities:
 - apt-get install autoconf automake libtool pkg-config libpcap-dev python3-pip python3-dev python3-numpy python3-scipy
 - pip3 install pandas sklearn sklearn-deltatfidf cffi argparse
 
-Setup:
+Deploymet (:Copy-Paste:)
 - cd opt/
 - git clone https://github.com/ArtWachowski/iec_61850.git;
 - cd iec_61850;
