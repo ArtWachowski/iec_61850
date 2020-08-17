@@ -74,10 +74,14 @@ int main(int argc, char *argv[])
         	}
         	count++;
     	}
-
-    	printf("Enter the number of the device you want to sniff : ");
-    	scanf("%d" , &n);
-    	devname = devs[n];
+	if(argv[1]==NULL)
+	{
+    		printf("Enter the number of the device you want to sniff : ");
+    		scanf("%d" , &n);
+    		devname = devs[n];
+	}else{
+		devname = argv[1];
+	}
 
 	printf("\n Started... device: %s\n", devname);
 	strcpy(dev, devname);
@@ -126,10 +130,10 @@ void ProcessPacket(u_char *args, const struct pcap_pkthdr *header, const u_char 
 	
 	//printf("Source port: %d  Dest port : %d \r\n", src, dst);
 
-	//TODO Introduce Flow inspections instead of individual packet ins ...
+	//TODO Introduce Flow inspection instead of individual packet ins ...
 
-        if (dst == dst_p ) //(src == src_p)  //(dst == dst_p ) //if 102 .  src == src_p || ..(src == src_p) //
-	{   
+        if ((src == src_p) || (dst == dst_p)) //(src == src_p)  //(dst == dst_p ) //if 102 .  src == src_p || ..(src == src_p) //
+	{
 		++total;
 		switch (iph->protocol) //Check the Protocol and do accordingly...
 		{
