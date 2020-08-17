@@ -9,9 +9,9 @@ from sklearn import preprocessing
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer, TfidfTransformer
 from sklearn_deltatfidf import DeltaTfidfVectorizer
 from sklearn.svm import SVC
-from sklearn.model_selection import GridSearchCV
+from sklearn.cluster import KMeans
 from sklearn.pipeline import Pipeline
-
+from io import StringIO
 
 ffi = cffi.FFI()
 ffi.cdef(open('ml_interface.h').read())
@@ -20,12 +20,13 @@ noGCDict = {}
 @ffi.callback("char *(char*, int)")
 def get_prediction(buffer, buffer_len):
 
+   
     try:
         data = ffi.buffer(buffer, buffer_len)[:]
         result = ffi.new('char []', data)
 
         #TODO - IF TRAIN MODE ##########SUPERVISED MODE :        
-        traffic_type = "RESPONSES" ################### For Trained - Supervised Learning
+        traffic_type = "LIVE" ################### For Trained - Supervised Learning
         f_extension = "_training_data.csv"
         f_name = traffic_type + f_extension
         if not os.path.isfile(f_name):
@@ -40,13 +41,18 @@ def get_prediction(buffer, buffer_len):
             ml_bytes,unique_id,ttl,id = ml_processing(data,traffic_type)
 
             try:
-                randomizator(ml_bytes,unique_id,ttl,id,f_name,traffic_type)
+                aa = randomizator(ml_bytes,unique_id,ttl,id,f_name,traffic_type)
+                #print("thissss ... aaaaaa",aa)
+                sv = get_super(aa)
+                print("SVM prediction result: ", sv)
+
             except:
                 print('randomizator Error!')
                 traceback.print_exc()
                 result = ffi.new('char []', b"Failed")  ### New message 
                 noGCDict[ffi.addressof(result)] = result
                 return result
+
 
                 
         except:
@@ -83,6 +89,24 @@ def fill_api(ptr):
     api = ffi.cast("struct API*", ptr)
     api.get_prediction = get_prediction
     api.release_object = release_object
+
+def get_super(data):
+
+    TESTDATA = StringIO(data)
+    df = pd.read_csv(TESTDATA, sep='\t',names=["Unique Id","TTL Value","Sum N-Gram Vectorizer","Average N-Gram-Feature","Tfidf Delta","Feature Count","N-GRAMS_3","N-GRAMS_DELTA_3","N-GRAMS_4","N-GRAMS_DELTA_4","N-GRAMS_5","N-GRAMS_DELTA_5","N-GRAMS_6","N-GRAMS_DELTA_6","Traffic Type"])
+
+    df.drop('Unique Id', axis=1, inplace=True)
+    df.drop('N-GRAMS_3', axis=1, inplace=True)
+    df.drop('N-GRAMS_4', axis=1, inplace=True)
+    df.drop('N-GRAMS_5', axis=1, inplace=True)
+    df.drop('N-GRAMS_6', axis=1, inplace=True)
+    X = df.drop('Traffic Type',axis=1)
+    print(df.head(2))
+    pickle_in = open('SVMlinearmodel','rb')
+    svm = pickle.load(pickle_in)
+    result = svm.predict(X)
+
+    return result
 
 def ml_processing(data,traffic_type):
     n=2
@@ -198,16 +222,21 @@ def randomizator(ml_bytes,unique_id,ttl,id,f_name,traffic_type):
         deltaT.astype(float)
         deltaT = np.sum(deltaT)
 
+        global new_string
         ng=str(n3)+"\t"+str(d3)+"\t"+str(n4)+"\t"+str(d4)+"\t"+str(n5)+"\t"+str(d5)+"\t"+str(n6)+"\t"+str(d6)
         new_string=str(unique_id)+"\t"+ttl+"\t"+str(deltaV)+"\t"+str(int(deltaV)/int(hashingVectorizer))+"\t"+str(deltaT)+"\t"+hashingVectorizer+"\t"+ng+"\t"+traffic_type
 
-        print(id,"- New Record", new_string)
+        #print(id,"- New Record", new_string)
 
         write_to_file(new_string,f_name)
         
+        
     except:
-        print('Even More Terrible Error!')
-        traceback.print_exc()
+        print('Randomizer!') #Even More Terrible Error!')
+        #traceback.print_exc()
+
+    return new_string
+
 
 def natural_language(raw):
 
