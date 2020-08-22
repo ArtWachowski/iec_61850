@@ -5,6 +5,7 @@ Contents:
 - Server_APP - High-interaction Honeypot 
 - Machine Learning based detection tool 
 - AttackClient 
+- Jupyter Notebook 
 
 Tested on Debian Linux - Ubuntu and Rpi3  
 
@@ -37,5 +38,7 @@ Run cc_snifer tool:
 cc_sniffer
 
 Run attackclient.py from iec61850 directory. 
+
+Jupyter - navigate to directory and run "jupyter notebook" command
 
 libiec61850 is an open-source (GPLv3) implementation of an IEC 61850 client and server library implementing the protocols MMS, GOOSE and SV, credit goes to MZ_Autoimation.
